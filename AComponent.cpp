@@ -62,10 +62,10 @@ nts::Tristate nts::AdvancedComponent::getInternLink(std::size_t pin) const
 
 nts::Tristate nts::AdvancedComponent::compute(std::size_t pin)
 {
-    if (pin >= _nbPins)
-        throw nts::Error("Pin index out of range");
-    if (pin < _pinIn)
+    if (isInput(pin))
         return getLink(pin);
-    else
+    else if (isOutput(pin))
         return getInternLink(pin);
+    else
+        throw nts::Error("Pin index out of range");
 }
