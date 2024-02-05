@@ -17,19 +17,21 @@ namespace nts {
         AComponent(std::size_t nbPins);
         ~AComponent() = default;
         void simulate(std::size_t tick) override {};
-        void setLink(std::size_t pin, nts::IComponent& other, std::size_t otherPin) override;
+        void setLink(std::size_t pin, nts::IComponent* other, std::size_t otherPin) override;
         nts::Tristate getLink(std::size_t pin) const override;
         std::size_t getNbPins() const override;
+        bool isInput(std::size_t pin) const override;
+        bool isOutput(std::size_t pin) const override;
     protected:
         std::size_t _nbPins;
         std::size_t _pinIn;
         std::size_t _pinOut;
-        std::vector<std::pair<std::size_t, IComponent&>> _links;
+        std::vector<std::pair<std::size_t, nts::IComponent*>> _links;
     };
 
     //class AndGate : public AComponent {
     //public:
-    //    AndGate();
+    //    AndGate(std::size_t nbPins = 3) : AComponent(nbPins) { _pinIn = nbPins - 1; _pinOut = 1; }
     //    ~AndGate() = default;
     //    nts::Tristate compute(std::size_t pin) override {
     //        if (pin == _nbPins - 1) {
@@ -50,11 +52,10 @@ namespace nts {
     public:
         AdvancedComponent(std::size_t nbPins);
         ~AdvancedComponent() = default;
-        nts::TriState compute(std::size_t pin) override {
-            _internLink[pin].second.compute(_internLink[pin].first);
-        }
+        nts::Tristate getInternLink(std::size_t pin) const;
+        nts::TriState compute(std::size_t pin) override;
     protected:
-        std::vector<std::pair<std::size_t, IComponent&>> _internLink;
+        std::vector<std::pair<std::size_t, IComponent*>> _internLink;
     };
 
 }  // namespace nts
