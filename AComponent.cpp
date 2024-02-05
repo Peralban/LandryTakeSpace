@@ -67,5 +67,3 @@ bool nts::AComponent::isAdvanced() const
 {
     return _advanced;
 }
-
-/*__________________________________________________________________________*/
