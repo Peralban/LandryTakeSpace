@@ -34,8 +34,10 @@ namespace nts
         virtual nts::Tristate compute(std::size_t pin) = 0;
         virtual void setLink(std::size_t pin, nts::IComponent& other, std::size_t otherPin) = 0;
         virtual nts::Tristate getLink(std::size_t pin) const = 0;
+        virtual nts::Tristate getInternLink(std::size_t pin) const = 0;
         virtual std::size_t getNbPins() const = 0;
         virtual bool isInput(std::size_t pin) const = 0;
         virtual bool isOutput(std::size_t pin) const = 0;
+        virtual bool isAdvanced() const = 0;
     };
 }  // namespace nts
