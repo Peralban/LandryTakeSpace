@@ -1,0 +1,32 @@
+name: Mirroring
+run-name: Deploy to ${{ inputs.deploy_target }} by @${{ github.actor }}
+
+env:
+  MIRROR_URL: "git@github.com:EpitechPromo2027/B-OOP-400-NAN-4-1-tekspice-alban.peralta.git"
+  EXECUTABLES: "nanotekspice"
+
+on:
+  push:
+    branches-ignore:
+      - "ga-ignore-*"
+  pull_request:
+    branches-ignore:
+      - "ga-ignore-*"
+
+push_to_mirror:
+    name: Push to mirror
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Mirror to Github
+        uses: pixta-dev/repository-mirroring-action@v1
+        with:
+          target_repo_url:
+            ${{ env.MIRROR_URL }}
+          ssh_private_key:
+            ${{ secrets.SSH_PRIVATE_KEY }}
