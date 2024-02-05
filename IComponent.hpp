@@ -11,6 +11,16 @@
 
 namespace nts
 {
+    class Error : public std::exception {
+    public:
+        Error(const std::string &message) : _message(message) {}
+        ~Error() = default;
+        const char *what() const noexcept override {
+                return _message.c_str();
+        }
+    private:
+        std::string _message;
+    };
     enum Tristate {
         Undefined = (-true),
         True = true,
