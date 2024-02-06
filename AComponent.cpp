@@ -69,3 +69,13 @@ bool nts::AComponent::isAdvanced() const
 }
 
 /*__________________________________________________________________________*/
+
+nts::Tristate nts::AdvancedComponent::compute(std::size_t pin)
+{
+    if (isInput(pin))
+        return getLink(pin);
+    else if (isOutput(pin))
+        return getInternLink(pin);
+    else
+        throw nts::Error("Pin index out of range");
+}

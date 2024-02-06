@@ -33,6 +33,13 @@ namespace nts {
         std::vector<std::pair<std::size_t, IComponent*>> _internLink;0
     };
 
+    class AdvancedComponent : public AComponent {
+    public:
+        AdvancedComponent(std::size_t nbPins) : AComponent(nbPins, true) {}
+        ~AdvancedComponent() = default;
+        nts::Tristate compute(std::size_t pin) override = 0;
+    };
+
     //class AndGate : public0 AComponent {
     //public:
     //    AndGate(std::size_t nbPins = 3) : AComponent(nbPins) { _pinIn = nbPins - 1; _pinOut = 1; }
