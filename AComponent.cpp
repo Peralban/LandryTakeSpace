@@ -78,4 +78,3 @@ nts::Tristate nts::AdvancedComponent::compute(std::size_t pin)
         return getInternLink(pin);
     else
         throw nts::Error("Pin index out of range");
-}
