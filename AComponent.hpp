@@ -110,6 +110,23 @@ namespace nts {
     //        throw nts::Error("Pin index out of range");
     //    }
     //};
+
+    //class Inverter : public AComponent {
+    //public:
+    //    Inverter() : AComponent(2) { _pinIn = 1; _pinOut = 1; }
+    //    ~Inverter() = default;
+    //    nts::Tristate compute(std::size_t pin) override {
+    //        if (isOutput(pin)) {
+    //            nts::Tristate buff = getLink(0);
+    //            if (buff == nts::Tristate::Undefined)
+    //                return nts::Tristate::Undefined;
+    //            return buff == nts::Tristate::True ? nts::Tristate::False : nts::Tristate::True;
+    //        }
+    //        if (isInput(pin))
+    //            return getLink(pin);
+    //        throw nts::Error("Pin index out of range");
+    //    }
+    //};
 //
     //class NotGate : public AComponent {
     //public:
@@ -142,6 +159,22 @@ namespace nts {
     //        andGate->setLink(andGate->getNbPins() - 1, notGate, 0);
     //    }
     //    ~NAndGate() = default;
+    //};
+
+    //class NOrGate : public AdvancedComponent {
+    //public:
+    //    NOrGate(std::size_t nbPins = 3) : AdvancedComponent(nbPins) {
+    //        _pinIn = nbPins - 1;
+    //        _pinOut = 1;
+    //        IComponent *orGate = new OrGate(nbPins - 1);
+    //        IComponent *notGate = new NotGate();
+    //        for (std::size_t i = 0; i < _pinIn; i++) {
+    //            setInternLink(i, orGate, i);
+    //        }
+    //        setInternLink(_nbPins - 1, notGate, 1);
+    //        orGate->setLink(orGate->getNbPins() - 1, notGate, 0);
+    //    }
+    //    ~NOrGate() = default;
     //};
 
 }  // namespace nts
