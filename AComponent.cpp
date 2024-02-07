@@ -10,10 +10,8 @@
 nts::AComponent::AComponent(std::size_t nbPins, bool advanced)
 {
     _nbPins = nbPins;
-    _links = std::vector<std::pair<std::size_t, nts::IComponent*>>(nbPins);
-    std::fill(_links.begin(), _links.end(), std::make_pair(0, nullptr));
-    _internLink = std::vector<std::pair<std::size_t, nts::IComponent*>>(nbPins);
-    std::fill(_internLink.begin(), _internLink.end(), std::make_pair(0, nullptr));
+    _links = std::vector<std::pair<std::size_t, nts::IComponent*>>(nbPins, std::make_pair(0, nullptr));
+    _internLink = std::vector<std::pair<std::size_t, nts::IComponent*>>(nbPins, std::make_pair(0, nullptr));
     _advanced = advanced;
     _inputPins = std::vector<bool>(nbPins, true);
 }
