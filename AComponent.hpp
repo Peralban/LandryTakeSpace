@@ -22,14 +22,15 @@ namespace nts {
         nts::Tristate getLink(std::size_t pin) const override;
         nts::Tristate getInternLink(std::size_t pin) const override;
         std::size_t getNbPins() const override;
+        void setInput(std::size_t pin) override;
+        void setOutput(std::size_t pin) override;
         bool isInput(std::size_t pin) const override;
         bool isOutput(std::size_t pin) const override;
         bool isAdvanced() const override;
     protected:
         bool _advanced;
         std::size_t _nbPins;
-        std::size_t _pinIn;
-        std::size_t _pinOut;
+        std::vector<bool> _inputPins;
         std::vector<std::pair<std::size_t, nts::IComponent*>> _links;
         std::vector<std::pair<std::size_t, IComponent*>> _internLink;0
     };
