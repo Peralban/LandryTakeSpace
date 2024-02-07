@@ -42,29 +42,7 @@ namespace nts {
         nts::Tristate compute(std::size_t pin) override;
     };
 
-    //class AndGate : public AComponent {
-    //public:
-    //    AndGate(std::size_t nbPins = 3) : AComponent(nbPins) { _pinIn = nbPins - 1; _pinOut = 1; }
-    //    ~AndGate() = default;
-    //    nts::Tristate compute(std::size_t pin) override {
-    //        if (isOutput(pin)) {
-    //            bool hasUndefined = false;
-    //            for (std::size_t i = 0; i < _nbPins - 1; i++) {
-    //                nts::Tristate buff = getLink(i);
-    //                if (buff == nts::Tristate::False)
-    //                    return nts::Tristate::False;
-    //                if (buff == nts::Tristate::Undefined)
-    //                    hasUndefined = true;
-    //            }
-    //            if (hasUndefined)
-    //                return nts::Tristate::Undefined;
-    //            return nts::Tristate::True;
-    //        }
-    //        if (isInput(pin))
-    //            return getLink(pin);
-    //        throw nts::Error("Pin index out of range");
-    //    }
-    //};
+
 //
     //class OrGate : public AComponent {
     //public:
