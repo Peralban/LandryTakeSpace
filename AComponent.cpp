@@ -11,16 +11,18 @@ nts::AComponent::AComponent(std::size_t nbPins, bool advanced)
 {
     _nbPins = nbPins;
     _links = std::vector<std::pair<std::size_t, nts::IComponent*>>(nbPins);
+    std::fill(_links.begin(), _links.end(), std::make_pair(0, nullptr));
     _internLink = std::vector<std::pair<std::size_t, nts::IComponent*>>(nbPins);
+    std::fill(_internLink.begin(), _internLink.end(), std::make_pair(0, nullptr));
     _advanced = advanced;
     _inputPins = std::vector<bool>(nbPins, true);
 }
 
-void nts::AComponent::setLink(std::size_t pin, nts::IComponent* other, std::size_t otherPin)
+void nts::AComponent::setLink(std::size_t pin, nts::IComponent *other, std::size_t otherPin)
 {
     if (pin >= _nbPins)
         throw nts::Error("Pin index out of range");
-    if (otherPin >= other.getNbPins())
+    if (otherPin >= other->getNbPins())
         throw nts::Error("Other pin index out of range");
     if (isOutput(pin) && other->isOutput(otherPin))
         throw nts::Error("Output pin cannot be linked to an output pin");
@@ -34,13 +36,13 @@ void nts::AComponent::setLink(std::size_t pin, nts::IComponent* other, std::size
     other->setLink(otherPin, this, pin);
 }
 
-void nts::AComponent::setInternLink(std::size_t pin, nts::IComponent* other, std::size_t otherPin)
+void nts::AComponent::setInternLink(std::size_t pin, nts::IComponent *other, std::size_t otherPin)
 {
     if (!isAdvanced())
         throw nts::Error("Component should not have internal links");
     if (pin >= _nbPins)
         throw nts::Error("Pin index out of range");
-    if (otherPin >= other.getNbPins())
+    if (otherPin >= other->getNbPins())
         throw nts::Error("Other pin index out of range");
     if (isOutput(pin) && other->isOutput(otherPin))
         throw nts::Error("Output pin cannot be linked to an output pin");
@@ -55,7 +57,9 @@ nts::Tristate nts::AComponent::getLink(std::size_t pin) const
 {
     if (pin >= _nbPins)
         throw nts::Error("Pin index out of range");
-    return _links[pin].second.compute(_links[pin].first);
+    if (_links[pin].second == nullptr)
+        return nts::Tristate::Undefined;
+    return _links[pin].second->compute(_links[pin].first);
 }
 
 nts::Tristate nts::AComponent::getInternLink(std::size_t pin) const
@@ -64,6 +68,8 @@ nts::Tristate nts::AComponent::getInternLink(std::size_t pin) const
         throw nts::Error("Component has no internal link");
     if (pin >= _nbPins)
         throw nts::Error("Pin index out of range");
+    if (_internLink[pin].second == nullptr)
+        return nts::Tristate::Undefined;
     return _internLink[pin].second->compute(_internLink[pin].first);
 }
 

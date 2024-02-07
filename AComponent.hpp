@@ -16,9 +16,9 @@ namespace nts {
     public:
         AComponent(std::size_t nbPins, bool advanced = false);
         ~AComponent() = default;
-        void simulate(std::size_t tick) override {};
-        void setLink(std::size_t pin, nts::IComponent* other, std::size_t otherPin) override;
-        void setInternLink(std::size_t pin, nts::IComponent* other, std::size_t otherPin) override;
+        void simulate(std::size_t tick) override {(void)tick;};
+        void setLink(std::size_t pin, nts::IComponent *other, std::size_t otherPin) override;
+        void setInternLink(std::size_t pin, nts::IComponent *other, std::size_t otherPin) override;
         nts::Tristate getLink(std::size_t pin) const override;
         nts::Tristate getInternLink(std::size_t pin) const override;
         std::size_t getNbPins() const override;
@@ -32,7 +32,7 @@ namespace nts {
         std::size_t _nbPins;
         std::vector<bool> _inputPins;
         std::vector<std::pair<std::size_t, nts::IComponent*>> _links;
-        std::vector<std::pair<std::size_t, IComponent*>> _internLink;0
+        std::vector<std::pair<std::size_t, IComponent*>> _internLink;
     };
 
     class AdvancedComponent : public AComponent {
