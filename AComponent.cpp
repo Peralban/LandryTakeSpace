@@ -32,6 +32,7 @@ void nts::AComponent::setLink(std::size_t pin, nts::IComponent* other, std::size
     _links[pin] = std::make_pair(otherPin, other);
     if (isAdvanced())
         _internLink[pin].second->setLink(_internLink[pin].first, other, otherPin);
+    other->setLink(otherPin, this, pin);
 }
 
 void nts::AComponent::setInternLink(std::size_t pin, nts::IComponent* other, std::size_t otherPin)
