@@ -2,3 +2,6 @@ nanotekspice
 .idea
 *.iml
 *.o
+Main.cpp
+*.out
+nts*
