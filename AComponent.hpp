@@ -42,28 +42,6 @@ namespace nts {
         nts::Tristate compute(std::size_t pin) override;
     };
 
-    //class XorGate : public AComponent {
-    //public:
-    //    XorGate(std::size_t nbPins = 3) : AComponent(nbPins) { _pinIn = nbPins - 1; _pinOut = 1; }
-    //    ~XorGate() = default;
-    //    nts::Tristate compute(std::size_t pin) override {
-    //        if (isOutput(pin)) {
-    //            size_t nbTrue = 0;
-    //            for (std::size_t i = 0; i < _nbPins - 1; i++) {
-    //                nts::Tristate buff = getLink(i);
-    //                if (buff == nts::Tristate::Undefined)
-    //                    return nts::Tristate::Undefined;
-    //                if (buff == nts::Tristate::True)
-    //                    nbTrue++;
-    //            }
-    //            return nbTrue % 2 ? nts::Tristate::True : nts::Tristate::False;
-    //        }
-    //        if (isInput(pin))
-    //            return getLink(pin);
-    //        throw nts::Error("Pin index out of range");
-    //    }
-    //};
-
     //class InverterGate : public AComponent {
     //public:
     //    InverterGate() : AComponent(2) { _pinIn = 1; _pinOut = 1; }
