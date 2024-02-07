@@ -37,6 +37,8 @@ namespace nts
         virtual nts::Tristate getLink(std::size_t pin) const = 0;
         virtual nts::Tristate getInternLink(std::size_t pin) const = 0;
         virtual std::size_t getNbPins() const = 0;
+        virtual void setInput(std::size_t pin) = 0;
+        virtual void setOutput(std::size_t pin) = 0;
         virtual bool isInput(std::size_t pin) const = 0;
         virtual bool isOutput(std::size_t pin) const = 0;
         virtual bool isAdvanced() const = 0;

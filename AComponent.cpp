@@ -10,11 +10,10 @@
 nts::AComponent::AComponent(std::size_t nbPins, bool advanced)
 {
     _nbPins = nbPins;
-    _pinIn = 0;
-    _pinOut = 0;
     _links = std::vector<std::pair<std::size_t, nts::IComponent*>>(nbPins);
     _internLink = std::vector<std::pair<std::size_t, nts::IComponent*>>(nbPins);
     _advanced = advanced;
+    _inputPins = std::vector<bool>(nbPins, true);
 }
 
 void nts::AComponent::setLink(std::size_t pin, nts::IComponent* other, std::size_t otherPin)
@@ -73,14 +72,28 @@ std::size_t nts::AComponent::getNbPins() const
     return _nbPins;
 }
 
+void nts::AComponent::setInput(std::size_t pin)
+{
+    if (pin >= _nbPins)
+        throw nts::Error("Pin index out of range");
+    _inputPins[pin] = true;
+}
+
+void nts::AComponent::setOutput(std::size_t pin)
+{
+    if (pin >= _nbPins)
+        throw nts::Error("Pin index out of range");
+    _inputPins[pin] = false;
+}
+
 bool nts::AComponent::isInput(std::size_t pin) const
 {
-    return pin < _pinIn;
+    return _inputPins[pin];
 }
 
 bool nts::AComponent::isOutput(std::size_t pin) const
 {
-    return pin >= _pinIn && pin < _pinOut;
+    return !_inputPins[pin];
 }
 
 bool nts::AComponent::isAdvanced() const
