@@ -16,5 +16,12 @@ namespace nts {
         ~AndGate() = default;
         nts::Tristate compute(std::size_t pin) override;
     };
+
+    class OrGate : public AComponent {
+    public:
+        OrGate(std::size_t nbPins = 3);
+        ~OrGate() = default;
+        nts::Tristate compute(std::size_t pin) override;
+    };
 }
 
