@@ -42,5 +42,7 @@ namespace nts
         virtual bool isInput(std::size_t pin) const = 0;
         virtual bool isOutput(std::size_t pin) const = 0;
         virtual bool isAdvanced() const = 0;
+        virtual bool isLinked(std::size_t pin) const = 0;
+        virtual nts::IComponent *linkedTo(std::size_t pin) const = 0;
     };
 }  // namespace nts

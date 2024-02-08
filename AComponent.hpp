@@ -27,6 +27,8 @@ namespace nts {
         bool isInput(std::size_t pin) const override;
         bool isOutput(std::size_t pin) const override;
         bool isAdvanced() const override;
+        bool isLinked(std::size_t pin) const override;
+        nts::IComponent *linkedTo(std::size_t pin) const override;
     protected:
         bool _advanced;
         std::size_t _nbPins;
