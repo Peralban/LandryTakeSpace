@@ -37,5 +37,11 @@ namespace nts {
         ~NotGate() = default;
         nts::Tristate compute(std::size_t pin) override;
     };
+
+    class NAndGate : public AdvancedComponent {
+    public:
+        NAndGate(std::size_t nbPins = 3);
+        ~NAndGate() = default;
+    };
 }
 
