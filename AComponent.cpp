@@ -24,11 +24,13 @@ void nts::AComponent::setLink(std::size_t pin, nts::IComponent *other, std::size
         throw nts::Error("Pin index out of range");
     if (otherPin > other->getNbPins() || otherPin == 0)
         throw nts::Error("Other pin index out of range");
+    if (isUnused(pin) || other->isUnused(otherPin))
+        throw nts::Error("Unused pin cannot be linked");
     if (isOutput(pin) && other->isOutput(otherPin))
         throw nts::Error("Output pin cannot be linked to an output pin");
     if (isInput(pin) && other->isInput(otherPin))
         throw nts::Error("Input pin cannot be linked to an input pin");
-    if (isLinked(pin) || (other->linkedTo(otherPin) != this && other->linkedTo(otherPin) != nullptr))
+    if (isLinked(pin))
         throw nts::Error("Pin already linked");
     _links[pin - 1] = std::make_pair(otherPin, other);
     if (isAdvanced())
@@ -44,6 +46,8 @@ void nts::AComponent::setInternLink(std::size_t pin, nts::IComponent *other, std
         throw nts::Error("Component should not have internal links");
     if (pin > _nbPins || pin == 0)
         throw nts::Error("Pin index out of range");
+    if (isUnused(pin) || other->isUnused(otherPin))
+        throw nts::Error("Unused pin cannot be linked");
     if (otherPin > other->getNbPins() || otherPin == 0)
         throw nts::Error("Other pin index out of range");
     if (isOutput(pin) && other->isInput(otherPin))
