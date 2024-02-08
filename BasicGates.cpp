@@ -89,3 +89,23 @@ nts::Tristate nts::XorGate::compute(std::size_t pin)
         throw nts::Error("Pin index out of range");
     }
 }
+
+/*-----------------NOT GATE-----------------*/
+
+nts::NotGate::NotGate() : nts::AComponent(2)
+{
+    setOutput(1);
+}
+
+nts::Tristate nts::NotGate::compute(std::size_t pin)
+{
+    if (isOutput(pin)) {
+        nts::Tristate buff = getLink(0);
+        if (buff == nts::Tristate::Undefined)
+            return nts::Tristate::Undefined;
+        return buff == nts::Tristate::True ? nts::Tristate::False : nts::Tristate::True;
+    }
+    if (isInput(pin))
+        return getLink(pin);
+    throw nts::Error("Pin index out of range");
+}

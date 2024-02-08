@@ -30,5 +30,12 @@ namespace nts {
         ~XorGate() = default;
         nts::Tristate compute(std::size_t pin) override;
     };
+
+    class NotGate : public AComponent {
+    public:
+        NotGate();
+        ~NotGate() = default;
+        nts::Tristate compute(std::size_t pin) override;
+    };
 }
 
