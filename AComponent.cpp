@@ -27,11 +27,13 @@ void nts::AComponent::setLink(std::size_t pin, nts::IComponent *other, std::size
     if (isInput(pin) && other->isInput(otherPin))
         throw nts::Error("Input pin cannot be linked to an input pin");
     if (_links[pin].second != nullptr)
-        throw nts::Error("Pin already linked");
+        throw nts::Error("Pin already linked " + std::to_string(pin) + " " + std::to_string(otherPin));
     _links[pin] = std::make_pair(otherPin, other);
     if (isAdvanced())
         _internLink[pin].second->setLink(_internLink[pin].first, other, otherPin);
-    other->setLink(otherPin, this, pin);
+    try {
+        other->setLink(otherPin, this, pin);
+    } catch (nts::Error &e) {}
 }
 
 void nts::AComponent::setInternLink(std::size_t pin, nts::IComponent *other, std::size_t otherPin)
