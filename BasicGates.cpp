@@ -11,7 +11,7 @@
 
 nts::AndGate::AndGate(std::size_t nbPins) : nts::AComponent(nbPins)
 {
-    setOutput(_nbPins - 1);
+    setOutput(nbPins);
 }
 
 nts::Tristate nts::AndGate::compute(std::size_t pin)
@@ -19,7 +19,7 @@ nts::Tristate nts::AndGate::compute(std::size_t pin)
     if (isOutput(pin)) {
         bool hasUndefined = false;
 
-        for (std::size_t i = 0; i < _nbPins - 1; i++) {
+        for (std::size_t i = 1; i < _nbPins; i++) {
             nts::Tristate buff = getLink(i);
             if (buff == nts::Tristate::False)
                 return nts::Tristate::False;
@@ -39,14 +39,14 @@ nts::Tristate nts::AndGate::compute(std::size_t pin)
 
 nts::OrGate::OrGate(std::size_t nbPins) : nts::AComponent(nbPins)
 {
-    setOutput(_nbPins - 1);
+    setOutput(nbPins);
 }
 
 nts::Tristate nts::OrGate::compute(std::size_t pin)
 {
     if (isOutput(pin)) {
         bool hasUndefined = false;
-        for (std::size_t i = 0; i < _nbPins - 1; i++) {
+        for (std::size_t i = 1; i < _nbPins; i++) {
             nts::Tristate buff = getLink(i);
             if (buff == nts::Tristate::True)
                 return nts::Tristate::True;
@@ -66,41 +66,39 @@ nts::Tristate nts::OrGate::compute(std::size_t pin)
 
 nts::XorGate::XorGate(std::size_t nbPins) : nts::AComponent(nbPins)
 {
-    setOutput(_nbPins - 1);
+    setOutput(nbPins);
 }
 
 nts::Tristate nts::XorGate::compute(std::size_t pin)
 {
-    {
-        if (isOutput(pin)) {
-            size_t nbTrue = 0;
+    if (isOutput(pin)) {
+        size_t nbTrue = 0;
 
-            for (std::size_t i = 0; i < _nbPins - 1; i++) {
-                nts::Tristate buff = getLink(i);
-                if (buff == nts::Tristate::Undefined)
-                    return nts::Tristate::Undefined;
-                if (buff == nts::Tristate::True)
-                    nbTrue++;
-            }
-            return nbTrue % 2 ? nts::Tristate::True : nts::Tristate::False;
+        for (std::size_t i = 1; i < _nbPins; i++) {
+            nts::Tristate buff = getLink(i);
+            if (buff == nts::Tristate::Undefined)
+                return nts::Tristate::Undefined;
+            if (buff == nts::Tristate::True)
+                nbTrue++;
         }
-        if (isInput(pin))
-            return getLink(pin);
-        throw nts::Error("Pin index out of range");
+        return nbTrue % 2 ? nts::Tristate::True : nts::Tristate::False;
     }
+    if (isInput(pin))
+        return getLink(pin);
+    throw nts::Error("Pin index out of range");
 }
 
 /*-----------------NOT GATE-----------------*/
 
 nts::NotGate::NotGate() : nts::AComponent(2)
 {
-    setOutput(1);
+    setOutput(2);
 }
 
 nts::Tristate nts::NotGate::compute(std::size_t pin)
 {
     if (isOutput(pin)) {
-        nts::Tristate buff = getLink(0);
+        nts::Tristate buff = getLink(1);
         if (buff == nts::Tristate::Undefined)
             return nts::Tristate::Undefined;
         return buff == nts::Tristate::True ? nts::Tristate::False : nts::Tristate::True;
@@ -114,40 +112,40 @@ nts::Tristate nts::NotGate::compute(std::size_t pin)
 
 nts::NAndGate::NAndGate(std::size_t nbPins) : nts::AdvancedComponent(nbPins)
 {
-    setOutput(_nbPins - 1);
-    IComponent *andGate = new AndGate(nbPins);
+    setOutput(_nbPins);
+    IComponent *andGate = new AndGate(_nbPins);
     IComponent *notGate = new NotGate();
-    for (std::size_t i = 0; i < _nbPins - 1; i++) {
+    for (std::size_t i = 1; i < _nbPins; i++) {
         setInternLink(i, andGate, i);
     }
-    setInternLink(_nbPins - 1, notGate, 1);
-    andGate->setLink(_nbPins - 1, notGate, 0);
+    setInternLink(_nbPins, notGate, 2);
+    andGate->setLink(_nbPins, notGate, 1);
 }
 
 /*-----------------NOR GATE-----------------*/
 
 nts::NOrGate::NOrGate(std::size_t nbPins) : nts::AdvancedComponent(nbPins)
 {
-    setOutput(_nbPins - 1);
-    IComponent *orGate = new OrGate(nbPins);
+    setOutput(_nbPins);
+    IComponent *orGate = new OrGate(_nbPins);
     IComponent *notGate = new NotGate();
-    for (std::size_t i = 0; i < _nbPins - 1; i++) {
+    for (std::size_t i = 1; i < _nbPins; i++) {
         setInternLink(i, orGate, i);
     }
-    setInternLink(_nbPins - 1, notGate, 1);
-    orGate->setLink(_nbPins - 1, notGate, 0);
+    setInternLink(_nbPins, notGate, 2);
+    orGate->setLink(_nbPins, notGate, 1);
 }
 
 /*-----------------NXOR GATE-----------------*/
 
 nts::NXorGate::NXorGate(std::size_t nbPins) : nts::AdvancedComponent(nbPins)
 {
-    setOutput(_nbPins - 1);
-    IComponent *xorGate = new XorGate(nbPins);
+    setOutput(_nbPins);
+    IComponent *xorGate = new XorGate(_nbPins);
     IComponent *notGate = new NotGate();
-    for (std::size_t i = 0; i < _nbPins - 1; i++) {
+    for (std::size_t i = 1; i < _nbPins; i++) {
         setInternLink(i, xorGate, i);
     }
-    setInternLink(_nbPins - 1, notGate, 1);
-    xorGate->setLink(_nbPins - 1, notGate, 0);
+    setInternLink(_nbPins, notGate, 2);
+    xorGate->setLink(_nbPins, notGate, 1);
 }
