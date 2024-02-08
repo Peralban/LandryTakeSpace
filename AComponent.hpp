@@ -43,21 +43,4 @@ namespace nts {
         ~AdvancedComponent() = default;
         nts::Tristate compute(std::size_t pin) override;
     };
-
-    //class NOrGate : public AdvancedComponent {
-    //public:
-    //    NOrGate(std::size_t nbPins = 3) : AdvancedComponent(nbPins) {
-    //        _pinIn = nbPins - 1;
-    //        _pinOut = 1;
-    //        IComponent *orGate = new OrGate(nbPins - 1);
-    //        IComponent *inverterGate = new InverterGate();
-    //        for (std::size_t i = 0; i < _pinIn; i++) {
-    //            setInternLink(i, orGate, i);
-    //        }
-    //        setInternLink(_nbPins - 1, inverterGate, 1);
-    //        orGate->setLink(orGate->getNbPins() - 1, inverterGate, 0);
-    //    }
-    //    ~NOrGate() = default;
-    //};
-
 }  // namespace nts

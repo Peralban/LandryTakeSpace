@@ -43,5 +43,18 @@ namespace nts {
         NAndGate(std::size_t nbPins = 3);
         ~NAndGate() = default;
     };
+
+    class NOrGate : public AdvancedComponent {
+    public:
+        NOrGate(std::size_t nbPins = 3);
+        ~NOrGate() = default;
+    };
+
+    class NXorGate : public AdvancedComponent {
+    public:
+        NXorGate(std::size_t nbPins = 3);
+        ~NXorGate() = default;
+    };
+
 }
 

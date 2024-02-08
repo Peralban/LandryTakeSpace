@@ -123,3 +123,31 @@ nts::NAndGate::NAndGate(std::size_t nbPins) : nts::AdvancedComponent(nbPins)
     setInternLink(_nbPins - 1, notGate, 1);
     andGate->setLink(_nbPins - 1, notGate, 0);
 }
+
+/*-----------------NOR GATE-----------------*/
+
+nts::NOrGate::NOrGate(std::size_t nbPins) : nts::AdvancedComponent(nbPins)
+{
+    setOutput(_nbPins - 1);
+    IComponent *orGate = new OrGate(nbPins);
+    IComponent *notGate = new NotGate();
+    for (std::size_t i = 0; i < _nbPins - 1; i++) {
+        setInternLink(i, orGate, i);
+    }
+    setInternLink(_nbPins - 1, notGate, 1);
+    orGate->setLink(_nbPins - 1, notGate, 0);
+}
+
+/*-----------------NXOR GATE-----------------*/
+
+nts::NXorGate::NXorGate(std::size_t nbPins) : nts::AdvancedComponent(nbPins)
+{
+    setOutput(_nbPins - 1);
+    IComponent *xorGate = new XorGate(nbPins);
+    IComponent *notGate = new NotGate();
+    for (std::size_t i = 0; i < _nbPins - 1; i++) {
+        setInternLink(i, xorGate, i);
+    }
+    setInternLink(_nbPins - 1, notGate, 1);
+    xorGate->setLink(_nbPins - 1, notGate, 0);
+}
