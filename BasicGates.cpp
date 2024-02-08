@@ -109,3 +109,17 @@ nts::Tristate nts::NotGate::compute(std::size_t pin)
         return getLink(pin);
     throw nts::Error("Pin index out of range");
 }
+
+/*-----------------NAND GATE-----------------*/
+
+nts::NAndGate::NAndGate(std::size_t nbPins) : nts::AdvancedComponent(nbPins)
+{
+    setOutput(_nbPins - 1);
+    IComponent *andGate = new AndGate(nbPins);
+    IComponent *notGate = new NotGate();
+    for (std::size_t i = 0; i < _nbPins - 1; i++) {
+        setInternLink(i, andGate, i);
+    }
+    setInternLink(_nbPins - 1, notGate, 1);
+    andGate->setLink(_nbPins - 1, notGate, 0);
+}

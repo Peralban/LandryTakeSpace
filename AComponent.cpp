@@ -44,10 +44,10 @@ void nts::AComponent::setInternLink(std::size_t pin, nts::IComponent *other, std
         throw nts::Error("Pin index out of range");
     if (otherPin >= other->getNbPins())
         throw nts::Error("Other pin index out of range");
-    if (isOutput(pin) && other->isOutput(otherPin))
-        throw nts::Error("Output pin cannot be linked to an output pin");
-    if (isInput(pin) && other->isInput(otherPin))
-        throw nts::Error("Input pin cannot be linked to an input pin");
+    if (isOutput(pin) && other->isInput(otherPin))
+        throw nts::Error("Output pin cannot be internally linked to an input pin");
+    if (isInput(pin) && other->isOutput(otherPin))
+        throw nts::Error("Input pin cannot be internally linked to an output pin");
     if (_internLink[pin].second != nullptr)
         throw nts::Error("Pin already linked");
     _internLink[pin] = std::make_pair(otherPin, other);
