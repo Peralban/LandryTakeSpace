@@ -24,15 +24,17 @@ namespace nts {
         std::size_t getNbPins() const override;
         void setInput(std::size_t pin) override;
         void setOutput(std::size_t pin) override;
+        void setUnused(std::size_t pin) override;
         bool isInput(std::size_t pin) const override;
         bool isOutput(std::size_t pin) const override;
+        bool isUnused(std::size_t pin) const override;
         bool isAdvanced() const override;
         bool isLinked(std::size_t pin) const override;
         nts::IComponent *linkedTo(std::size_t pin) const override;
     protected:
-        bool _advanced;
+        bool _advanced; // Advanced components have internal links to internal components
         std::size_t _nbPins;
-        std::vector<bool> _inputPins;
+        std::vector<nts::Tristate> _inputPins; // True = Input, False = Output, Undefined = Unused
         std::vector<std::pair<std::size_t, nts::IComponent*>> _links;
         std::vector<std::pair<std::size_t, IComponent*>> _internLink;
     };
@@ -43,37 +45,4 @@ namespace nts {
         ~AdvancedComponent() = default;
         nts::Tristate compute(std::size_t pin) override;
     };
-
-    //class NAndGate : public AdvancedComponent {
-    //public:
-    //    NAndGate(std::size_t nbPins = 3) : AdvancedComponent(nbPins) {
-    //        _pinIn = nbPins - 1;
-    //        _pinOut = 1;
-    //        IComponent *andGate = new AndGate(nbPins - 1);
-    //        IComponent *inverterGate = new InverterGate();
-    //        for (std::size_t i = 0; i < _pinIn; i++) {
-    //            setInternLink(i, andGate, i);
-    //        }
-    //        setInternLink(_nbPins - 1, inverterGate, 1);
-    //        andGate->setLink(andGate->getNbPins() - 1, inverterGate, 0);
-    //    }
-    //    ~NAndGate() = default;
-    //};
-
-    //class NOrGate : public AdvancedComponent {
-    //public:
-    //    NOrGate(std::size_t nbPins = 3) : AdvancedComponent(nbPins) {
-    //        _pinIn = nbPins - 1;
-    //        _pinOut = 1;
-    //        IComponent *orGate = new OrGate(nbPins - 1);
-    //        IComponent *inverterGate = new InverterGate();
-    //        for (std::size_t i = 0; i < _pinIn; i++) {
-    //            setInternLink(i, orGate, i);
-    //        }
-    //        setInternLink(_nbPins - 1, inverterGate, 1);
-    //        orGate->setLink(orGate->getNbPins() - 1, inverterGate, 0);
-    //    }
-    //    ~NOrGate() = default;
-    //};
-
 }  // namespace nts
