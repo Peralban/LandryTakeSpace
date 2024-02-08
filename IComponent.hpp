@@ -39,8 +39,10 @@ namespace nts
         virtual std::size_t getNbPins() const = 0;
         virtual void setInput(std::size_t pin) = 0;
         virtual void setOutput(std::size_t pin) = 0;
+        virtual void setUnused(std::size_t pin) = 0;
         virtual bool isInput(std::size_t pin) const = 0;
         virtual bool isOutput(std::size_t pin) const = 0;
+        virtual bool isUnused(std::size_t pin) const = 0;
         virtual bool isAdvanced() const = 0;
         virtual bool isLinked(std::size_t pin) const = 0;
         virtual nts::IComponent *linkedTo(std::size_t pin) const = 0;

@@ -15,7 +15,7 @@ nts::AComponent::AComponent(std::size_t nbPins, bool advanced)
     _links = std::vector<std::pair<std::size_t, nts::IComponent*>>(nbPins, std::make_pair(0, nullptr));
     _internLink = std::vector<std::pair<std::size_t, nts::IComponent*>>(nbPins, std::make_pair(0, nullptr));
     _advanced = advanced;
-    _inputPins = std::vector<bool>(nbPins, true);
+    _inputPins = std::vector<nts::Tristate>(nbPins, nts::Tristate::Undefined);
 }
 
 void nts::AComponent::setLink(std::size_t pin, nts::IComponent *other, std::size_t otherPin)
@@ -84,28 +84,42 @@ void nts::AComponent::setInput(std::size_t pin)
 {
     if (pin > _nbPins || pin == 0)
         throw nts::Error("Pin index out of range");
-    _inputPins[pin - 1] = true;
+    _inputPins[pin - 1] = nts::Tristate::True;
 }
 
 void nts::AComponent::setOutput(std::size_t pin)
 {
     if (pin > _nbPins || pin == 0)
         throw nts::Error("Pin index out of range");
-    _inputPins[pin - 1] = false;
+    _inputPins[pin - 1] = nts::Tristate::False;
+}
+
+void nts::AComponent::setUnused(std::size_t pin)
+{
+    if (pin > _nbPins || pin == 0)
+        throw nts::Error("Pin index out of range");
+    _inputPins[pin - 1] = nts::Tristate::Undefined;
 }
 
 bool nts::AComponent::isInput(std::size_t pin) const
 {
     if (pin > _nbPins || pin == 0)
         throw nts::Error("Pin index out of range");
-    return _inputPins[pin - 1];
+    return _inputPins[pin - 1] == nts::Tristate::True;
 }
 
 bool nts::AComponent::isOutput(std::size_t pin) const
 {
     if (pin > _nbPins || pin == 0)
         throw nts::Error("Pin index out of range");
-    return !_inputPins[pin - 1];
+    return _inputPins[pin - 1] == nts::Tristate::False;
+}
+
+bool nts::AComponent::isUnused(std::size_t pin) const
+{
+    if (pin > _nbPins || pin == 0)
+        throw nts::Error("Pin index out of range");
+    return _inputPins[pin - 1] == nts::Tristate::Undefined;
 }
 
 bool nts::AComponent::isAdvanced() const
