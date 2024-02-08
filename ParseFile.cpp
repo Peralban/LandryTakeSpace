@@ -45,29 +45,60 @@ static std::string CreateComponent(std::string componentName)
     return componentName;
 }
 
-static void ParseData(std::vector<std::string> fileContent)
+static std::pair<std::vector<std::pair</*nts::IComponent **/std::string, std::string>>, std::vector<std::pair<std::pair</*First Name*/std::string, /*First PIN*/std::string>, std::pair</*Second Name*/std::string, /*Second PIN*/std::string>>>> ParseData(std::vector<std::string> fileContent)
 {
     std::vector<std::pair</*nts::IComponent **/std::string, std::string>> components;
+    std::vector<std::pair<std::pair</*First Name*/std::string, /*First PIN*/std::string>, std::pair</*Second Name*/std::string, /*Second PIN*/std::string>>> links;
     nts::ParseState state = nts::ParseState::NONE;
     for (auto &line : fileContent) {
-        if (line.empty())
-            continue;
-        if (line.find("#") != std::string::npos)
+        if (line.find("#") != std::string::npos || line.empty())
             continue;
         if (line.find(".chipsets:") != std::string::npos) {
             state = nts::ParseState::CHIPSETS;
             continue;
         }
-        if (line.find(".links:") != std::string::npos)
+        if (line.find(".links:") != std::string::npos) {
             state = nts::ParseState::LINKS;
-        if (state != nts::ParseState::CHIPSETS)
             continue;
-        std::string componentName = line.substr(0, line.find(" "));
-        std::string name = line.substr(line.find(" ") + 1);
-        components.push_back(std::make_pair(CreateComponent(componentName), name));
+        }
+        if (state == nts::ParseState::CHIPSETS) {
+            std::string componentName = line.substr(0, line.find(" "));
+            std::string name = line.substr(line.find(" ") + 1);
+            components.push_back(std::make_pair(CreateComponent(componentName), name));
+        }
+        if (state == nts::ParseState::LINKS) {
+            std::string firstName = line.substr(0, line.find(":"));
+            line = line.substr(line.find(":") + 1);
+            std::string firstPin = line.substr(0, line.find(" "));
+            line = line.substr(line.find(" ") + 1);
+            std::string secondName = line.substr(0, line.find(":"));
+            line = line.substr(line.find(":") + 1);
+            std::string secondPin = line;
+            links.push_back(std::make_pair(std::make_pair(firstName, firstPin), std::make_pair(secondName, secondPin)));
+        }
     }
+    std::cout << std::endl << std::endl;
     for (size_t i = 0; i < components.size(); i++)
         std::cout << components[i].first << " " << components[i].second << std::endl;
+    for (size_t i = 0; i < links.size(); i++)
+        std::cout << links[i].first.first << " :: " << links[i].first.second << " /=/ " << links[i].second.first << " :: " << links[i].second.second << std::endl;
+    return std::make_pair(components, links);
+}
+
+static std::vector<std::pair</*nts::IComponent **/std::string, std::string>> LinkComponents(std::vector<std::pair</*nts::IComponent **/std::string, std::string>> components, std::vector<std::pair<std::pair</*First Name*/std::string, /*First PIN*/std::string>, std::pair</*Second Name*/std::string, /*Second PIN*/std::string>>> links)
+{
+    //std::vector<std::pair</*nts::IComponent **/std::string, std::string>> LinkedComponents;
+    //for (size_t i = 0; i < components.size(); i++) {
+    //    for (size_t j = 0; j < links.size(); j++) {
+    //        if (components[i].second == links[j].first.first) {
+    //            LinkedComponents.push_back(std::make_pair(components[i].first, links[j].first.second));
+    //        }
+    //        if (components[i].second == links[j].second.first) {
+    //            LinkedComponents.push_back(std::make_pair(components[i].first, links[j].second.second));
+    //        }
+    //    }
+    //}
+    //return LinkedComponents;
 }
 
 void parseFile(int ac, char **av)
@@ -77,5 +108,8 @@ void parseFile(int ac, char **av)
     for (auto &line : fileContent) {
         std::cout << line << std::endl;
     }
-    ParseData(fileContent);
+    std::pair<std::vector<std::pair</*nts::IComponent **/std::string, std::string>>, std::vector<std::pair<std::pair</*First Name*/std::string, /*First PIN*/std::string>, std::pair</*Second Name*/std::string, /*Second PIN*/std::string>>>> ParsedFile = ParseData(fileContent);
+    std::vector<std::pair</*nts::IComponent **/std::string, std::string>> components = ParsedFile.first;
+    std::vector<std::pair<std::pair</*First Name*/std::string, /*First PIN*/std::string>, std::pair</*Second Name*/std::string, /*Second PIN*/std::string>>> links = ParsedFile.second;
+    std::vector<std::pair</*nts::IComponent **/std::string, std::string>> LinkedComponents = LinkComponents(components, links);
 }
