@@ -56,5 +56,12 @@ namespace nts {
         ~NXorGate() = default;
     };
 
+    class Splitter : public AComponent {
+    public:
+        Splitter(std::size_t nbPins = 3);
+        ~Splitter() = default;
+        nts::Tristate compute(std::size_t pin) override;
+    };
+
 }
 
