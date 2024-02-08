@@ -111,5 +111,5 @@ void parseFile(int ac, char **av)
     std::pair<std::vector<std::pair</*nts::IComponent **/std::string, std::string>>, std::vector<std::pair<std::pair</*First Name*/std::string, /*First PIN*/std::string>, std::pair</*Second Name*/std::string, /*Second PIN*/std::string>>>> ParsedFile = ParseData(fileContent);
     std::vector<std::pair</*nts::IComponent **/std::string, std::string>> components = ParsedFile.first;
     std::vector<std::pair<std::pair</*First Name*/std::string, /*First PIN*/std::string>, std::pair</*Second Name*/std::string, /*Second PIN*/std::string>>> links = ParsedFile.second;
-    std::vector<std::pair</*nts::IComponent **/std::string, std::string>> LinkedComponents = LinkComponents(components, links);
+    //std::vector<std::pair</*nts::IComponent **/std::string, std::string>> LinkedComponents = LinkComponents(components, links);
 }
