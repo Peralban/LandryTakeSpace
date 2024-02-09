@@ -18,6 +18,10 @@ namespace nts
         "clock",
         "true",
         "false",
+        "and",
+        "or",
+        "xor",
+        "not",
         "4001",
         "4008",
         "4011",
@@ -30,7 +34,8 @@ namespace nts
         "4081",
         "4094",
         "4514",
-        "4801"
+        "4801",
+        "end"
     };
     enum ParseState {
         CHIPSETS,
