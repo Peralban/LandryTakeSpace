@@ -55,10 +55,8 @@ nts::FourGates::FourGates(std::string name) : AdvancedComponent(14)
 
     // may change the way of doing this
     std::vector<IComponent *> gates(4);
-    gates[0] = createComponent(name);
-    gates[1] = createComponent(name);
-    gates[2] = createComponent(name);
-    gates[3] = createComponent(name);
+    for (std::size_t i = 0; i < 4; i++)
+        gates[i] = createComponent(name);
 
     std::size_t tmp = 0;
     for (std::size_t i = 0; i < 4; i++) {
@@ -68,6 +66,31 @@ nts::FourGates::FourGates(std::string name) : AdvancedComponent(14)
             setInternLink(i * 3 + (i % 2 == 0 ? 3 : 1) + tmp, gates[i], 3);
             if (i == 1)
                 tmp = 1;
+        } catch (nts::Error &e) {
+            std::cerr << e.what() << std::endl;
+        }
+    }
+}
+
+nts::Component4069::Component4069() : AdvancedComponent(14)
+{
+    for (std::size_t i = 0; i < 7; i++) {
+        setInput(i * 2 + 1);
+        setOutput(i * 2 + 2);
+    }
+    setUnused(7);
+    setUnused(14);
+
+    std::vector<IComponent *> gates(6);
+    for (std::size_t i = 0; i < 6; i++)
+        gates[i] = createComponent("not");
+
+    for (std::size_t i = 0; i < 3; i++) {
+        try {
+            setInternLink(i * 2 + 1, gates[i], 1);
+            setInternLink(i * 2 + 2, gates[i], 2);
+            setInternLink(i * 2 + 8, gates[i + 3], 2);
+            setInternLink(i * 2 + 9, gates[i + 3], 1);
         } catch (nts::Error &e) {
             std::cerr << e.what() << std::endl;
         }

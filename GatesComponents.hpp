@@ -38,6 +38,11 @@ namespace nts {
     };
 
     // 4069 component: 6 NOT gates
+    class Component4069 : public AdvancedComponent {
+    public:
+        Component4069();
+        ~Component4069() = default;
+    };
 
     // 4011 component: 4 NAND gates
     class Component4011 : public FourGates {
