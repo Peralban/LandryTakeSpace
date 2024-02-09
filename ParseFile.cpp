@@ -21,6 +21,10 @@ static void error_case(int ac, char **av)
         std::cout << "    file    file describing the circuit" << std::endl;
         exit(0);
     }
+    if (std::string(av[1]).find(".nts") == std::string::npos) {
+        std::cerr << "Error: invalid file extension" << std::endl;
+        exit(84);
+    }
 }
 
 static std::vector<std::string> fileInVector(std::string fileName)
@@ -64,7 +68,7 @@ static std::pair<std::vector<std::pair</*nts::IComponent **/std::string, std::st
     std::vector<std::string> names;
     names.push_back("end");
     for (auto &line : fileContent) {
-        if (line.find("#") != std::string::npos || line.empty())
+        if (line.empty() || line[0] == '#')
             continue;
         if (line.find(".chipsets:") != std::string::npos) {
             state = nts::ParseState::CHIPSETS;
