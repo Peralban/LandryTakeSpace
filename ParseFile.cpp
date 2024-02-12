@@ -7,6 +7,7 @@
 
 #include "ParseFile.hpp"
 #include <fstream>
+#include <cstring>
 
 static void error_case(int ac, char **av)
 {
@@ -21,7 +22,7 @@ static void error_case(int ac, char **av)
         std::cout << "    file    file describing the circuit" << std::endl;
         exit(0);
     }
-    if (std::string(av[1]).find(".nts") == std::string::npos) {
+    if (std::string(av[1] + strlen(av[1]) - 4) != ".nts") {
         std::cerr << "Error: invalid file extension" << std::endl;
         exit(84);
     }
@@ -42,14 +43,10 @@ static std::vector<std::string> fileInVector(std::string fileName)
     return fileContent;
 }
 
-static std::string CreateComponent(std::string componentName)
-{
-    return componentName;
-}
-
 static bool checkName(std::vector<std::string> type, std::string name)
 {
     for (size_t i = 0; i < type.size(); i++) {
+        std::cout << type[i] << " " << name << std::endl;
         if (name == type[i])
             return true;
         if (type[i] == "end") {
@@ -58,6 +55,34 @@ static bool checkName(std::vector<std::string> type, std::string name)
         }
     }
     return true;
+}
+
+static void SaveLinkInVector(std::vector<std::pair<std::pair</*First Name*/std::string, /*First PIN*/std::string>, std::pair</*Second Name*/std::string, /*Second PIN*/std::string>>> &links, std::string line, std::vector<std::string> names)
+{
+    std::string firstName = line.substr(0, line.find(":"));
+    if (!checkName(names, firstName))
+        exit(84);
+    line = line.substr(line.find(":") + 1);
+    std::string firstPin = line.substr(0, line.find(" "));
+    line = line.substr(line.find(" ") + 1);
+    std::string secondName = line.substr(0, line.find(":"));
+    if (!checkName(names, secondName))
+        exit(84);
+    line = line.substr(line.find(":") + 1);
+    std::string secondPin = line;
+    links.push_back(std::make_pair(std::make_pair(firstName, firstPin), std::make_pair(secondName, secondPin)));
+}
+
+static void SaveShipsetInVector(std::vector<std::pair</*nts::IComponent **/std::string, std::string>> &components, std::string line, std::vector<std::string> *names)
+{
+    std::string componentName = line.substr(0, line.find(" "));
+    if (!checkName(nts::type, componentName))
+        exit(84);
+    std::string name = line.substr(line.find(" ") + 1);
+    names->pop_back();
+    names->push_back(name);
+    names->push_back("end");
+    //components.push_back(std::make_pair(CreateComponent(componentName), name));
 }
 
 static std::pair<std::vector<std::pair</*nts::IComponent **/std::string, std::string>>, std::vector<std::pair<std::pair</*First Name*/std::string, /*First PIN*/std::string>, std::pair</*Second Name*/std::string, /*Second PIN*/std::string>>>> ParseData(std::vector<std::string> fileContent)
@@ -78,30 +103,10 @@ static std::pair<std::vector<std::pair</*nts::IComponent **/std::string, std::st
             state = nts::ParseState::LINKS;
             continue;
         }
-        if (state == nts::ParseState::CHIPSETS) {
-            std::string componentName = line.substr(0, line.find(" "));
-            if (!checkName(nts::type, componentName))
-                exit(84);
-            std::string name = line.substr(line.find(" ") + 1);
-            names.pop_back();
-            names.push_back(name);
-            names.push_back("end");
-            components.push_back(std::make_pair(CreateComponent(componentName), name));
-        }
-        if (state == nts::ParseState::LINKS) {
-            std::string firstName = line.substr(0, line.find(":"));
-            if (!checkName(names, firstName))
-                exit(84);
-            line = line.substr(line.find(":") + 1);
-            std::string firstPin = line.substr(0, line.find(" "));
-            line = line.substr(line.find(" ") + 1);
-            std::string secondName = line.substr(0, line.find(":"));
-            if (!checkName(names, secondName))
-                exit(84);
-            line = line.substr(line.find(":") + 1);
-            std::string secondPin = line;
-            links.push_back(std::make_pair(std::make_pair(firstName, firstPin), std::make_pair(secondName, secondPin)));
-        }
+        if (state == nts::ParseState::CHIPSETS)
+            SaveShipsetInVector(components, line, &names);
+        if (state == nts::ParseState::LINKS)
+            SaveLinkInVector(links, line, names);
     }
     return std::make_pair(components, links);
 }
