@@ -31,12 +31,16 @@ namespace nts {
         bool isAdvanced() const override;
         bool isLinked(std::size_t pin) const override;
         nts::IComponent *linkedTo(std::size_t pin) const override;
+        void checkInfinityCounter() override;
+        void resetInfinityCounter() override;
     protected:
         bool _advanced; // Advanced components have internal links to internal components
         std::size_t _nbPins;
         std::vector<nts::Tristate> _inputPins; // True = Input, False = Output, Undefined = Unused
         std::vector<std::pair<std::size_t, nts::IComponent*>> _links;
         std::vector<std::pair<std::size_t, IComponent*>> _internLink;
+        std::size_t _counter;
+        nts::Tristate _state;
     };
 
     class AdvancedComponent : public AComponent {

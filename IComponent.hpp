@@ -46,5 +46,7 @@ namespace nts
         virtual bool isAdvanced() const = 0;
         virtual bool isLinked(std::size_t pin) const = 0;
         virtual nts::IComponent *linkedTo(std::size_t pin) const = 0;
+        virtual void checkInfinityCounter() = 0;
+        virtual void resetInfinityCounter() = 0;
     };
 }  // namespace nts
