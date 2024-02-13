@@ -2,4 +2,7 @@ nanotekspice
 .idea
 *.iml
 *.o
+Main.cpp
+*.out
+nts*
 B-OOP-400_nanotekspice
