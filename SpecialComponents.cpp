@@ -9,7 +9,7 @@
 
 nts::TrueComponent::TrueComponent() : AComponent(1)
 {
-    setOutput(0);
+    setOutput(1);
 }
 
 nts::Tristate nts::TrueComponent::compute(std::size_t pin)
@@ -21,7 +21,7 @@ nts::Tristate nts::TrueComponent::compute(std::size_t pin)
 
 nts::FalseComponent::FalseComponent() : AComponent(1)
 {
-    setOutput(0);
+    setOutput(1);
 }
 
 nts::Tristate nts::FalseComponent::compute(std::size_t pin)

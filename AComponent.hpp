@@ -24,15 +24,17 @@ namespace nts {
         std::size_t getNbPins() const override;
         void setInput(std::size_t pin) override;
         void setOutput(std::size_t pin) override;
+        void setUnused(std::size_t pin) override;
         bool isInput(std::size_t pin) const override;
         bool isOutput(std::size_t pin) const override;
+        bool isUnused(std::size_t pin) const override;
         bool isAdvanced() const override;
         bool isLinked(std::size_t pin) const override;
         nts::IComponent *linkedTo(std::size_t pin) const override;
     protected:
-        bool _advanced;
+        bool _advanced; // Advanced components have internal links to internal components
         std::size_t _nbPins;
-        std::vector<bool> _inputPins;
+        std::vector<nts::Tristate> _inputPins; // True = Input, False = Output, Undefined = Unused
         std::vector<std::pair<std::size_t, nts::IComponent*>> _links;
         std::vector<std::pair<std::size_t, IComponent*>> _internLink;
     };
