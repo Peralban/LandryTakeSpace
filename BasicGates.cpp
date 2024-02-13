@@ -18,10 +18,9 @@ nts::AndGate::AndGate(std::size_t inputs) : nts::AComponent(inputs + 1)
 
 nts::Tristate nts::AndGate::compute(std::size_t pin)
 {
+    checkInfinityCounter();
     if (_state != nts::Tristate::Undefined)
         return _state;
-
-    checkInfinityCounter();
 
     if (isOutput(pin)) {
         bool hasUndefined = false;
@@ -62,10 +61,9 @@ nts::OrGate::OrGate(std::size_t inputs) : nts::AComponent(inputs + 1)
 
 nts::Tristate nts::OrGate::compute(std::size_t pin)
 {
+    checkInfinityCounter();
     if (_state != nts::Tristate::Undefined)
         return _state;
-
-    checkInfinityCounter();
 
     if (isOutput(pin)) {
         bool hasUndefined = false;
@@ -105,10 +103,9 @@ nts::XorGate::XorGate(std::size_t inputs) : nts::AComponent(inputs + 1)
 
 nts::Tristate nts::XorGate::compute(std::size_t pin)
 {
+    checkInfinityCounter();
     if (_state != nts::Tristate::Undefined)
         return _state;
-
-    checkInfinityCounter();
 
     if (isOutput(pin)) {
         size_t nbTrue = 0;

@@ -38,12 +38,8 @@ nts::DFlipFlop::DFlipFlop() : AdvancedComponent(6)
     setInternLink(6, splitter[9], 2);
     // all internal links are set
 
-    nandGates[0]->setLink(4, splitter[4], 1);
-    nandGates[1]->setLink(4, splitter[5], 1);
-    nandGates[2]->setLink(4, splitter[6], 1);
-    nandGates[3]->setLink(4, splitter[7], 1);
-    nandGates[4]->setLink(4, splitter[8], 1);
-    nandGates[5]->setLink(4, splitter[9], 1);
+    for (std::size_t i = 0; i < 6; i++)
+        nandGates[i]->setLink(4, splitter[i + 4], 1);
     // all nand gates outputs are linked to the splitter inputs
 
     // SET
