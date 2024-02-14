@@ -12,7 +12,7 @@
 // ! temporary !
 // This function is used to create a component based on the type given in parameter
 
-nts::IComponent *createComponent(std::string type)
+static nts::IComponent *createComponent(std::string type)
 {
     if (type == "and")
         return new nts::AndGate();
@@ -83,7 +83,7 @@ nts::Component4069::Component4069() : AdvancedComponent(14)
 
     std::vector<IComponent *> gates(6);
     for (std::size_t i = 0; i < 6; i++)
-        gates[i] = createComponent("not");
+        gates[i] = new NotGate();
 
     for (std::size_t i = 0; i < 3; i++) {
         try {
