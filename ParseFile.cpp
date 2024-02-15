@@ -71,7 +71,15 @@ void nts::ParseFile::saveLinkInVector(std::string line, std::vector<std::string>
     links.push_back(std::make_pair(std::make_pair(firstName, firstPin), std::make_pair(secondName, secondPin)));
 }
 
-static void SaveShipsetInVector(std::vector<std::pair</*nts::IComponent **/std::string, std::string>> &components, std::string line, std::vector<std::string> *names)
+static bool isInput(std::string name)
+{
+    for (size_t i = 0; i < nts::inputList.size(); i++) {
+        if (name == nts::inputList[i])
+            return true;
+    }
+    return false;
+}
+
 void nts::ParseFile::saveShipsetInVector(std::string line, std::vector<std::string> &names)
 {
     std::string componentName = line.substr(0, line.find(" "));
@@ -82,7 +90,14 @@ void nts::ParseFile::saveShipsetInVector(std::string line, std::vector<std::stri
     names->push_back(name);
     names->push_back("end");
     //components.push_back(std::make_pair(CreateComponent(componentName), name));
-}
+    if (isInput(componentName)) {
+        _nbInput++;
+        _inputsVector.push_back(std::make_pair(component, name));
+    }
+    if (componentName == "output") {
+        _nbOutput++;
+        _outputsVector.push_back(std::make_pair(component, name));
+    }
 
 static bool isFlag(std::string line, nts::ParseState &state)
 {
@@ -98,6 +113,10 @@ void nts::ParseFile::parseData(void) {
         if (line.find(".chipsets:") != std::string::npos) {
             state = nts::ParseState::CHIPSETS;
             continue;
+    if (_nbInput == 0 && _nbOutput == 0)
+        throw nts::Error("No input and output found");
+    if ((_nbInput == 0) xor (_nbOutput == 0))
+        throw nts::Error(((_nbInput == 0) ? "No input found" : "No output found"));
 void nts::ParseFile::linkComponents(void)
         }
         if (line.find(".links:") != std::string::npos) {
