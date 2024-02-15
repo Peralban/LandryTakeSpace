@@ -1,6 +1,6 @@
 /*
 ** EPITECH PROJECT, 2024
-** ParseFike.hpp
+** ParseFile.hpp
 ** File description:
 ** Abstract for components
 */
@@ -13,7 +13,7 @@
 
 namespace nts
 {
-    std::vector<std::string> type = {
+    static std::vector<std::string> type = {
         "input",
         "output",
         "clock",
@@ -38,10 +38,24 @@ namespace nts
         "4801",
         "end"
     };
+
+    static std::vector<std::string> inputList = {
+        "input",
+        "output",
+        "clock",
+        "true",
+        "false",
+    };
+
     enum ParseState {
         CHIPSETS,
         LINKS,
         NONE
+    };
+
+    static std::vector <std::string> flags = {
+        ".chipsets:",
+        ".links:"
     };
 
     typedef std::vector<std::pair<nts::IComponent *, std::string>> componentAndNameInVector;
