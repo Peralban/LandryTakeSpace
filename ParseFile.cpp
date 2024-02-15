@@ -6,8 +6,6 @@
 */
 
 #include "ParseFile.hpp"
-#include <fstream>
-#include <cstring>
 
 void nts::ParseFile::error_case(int ac, char **av)
 {

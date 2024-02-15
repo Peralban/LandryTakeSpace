@@ -7,8 +7,9 @@
 
 #pragma once
 
-#include <iostream>
-#include <vector>
+#include "CreateComponent.hpp"
+#include <fstream>
+#include <cstring>
 
 namespace nts
 {
