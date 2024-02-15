@@ -9,7 +9,7 @@
 #include <fstream>
 #include <cstring>
 
-static void error_case(int ac, char **av)
+void nts::ParseFile::error_case(int ac, char **av)
 {
     if (ac != 2) {
         std::cerr << "Error: invalid number of arguments" << std::endl;
@@ -43,7 +43,7 @@ static std::vector<std::string> fileInVector(std::string fileName)
     return fileContent;
 }
 
-static bool checkName(std::vector<std::string> type, std::string name)
+void nts::ParseFile::checkName(std::vector<std::string> type, std::string name)
 {
     for (size_t i = 0; i < type.size(); i++) {
         std::cout << type[i] << " " << name << std::endl;
@@ -57,7 +57,7 @@ static bool checkName(std::vector<std::string> type, std::string name)
     return true;
 }
 
-static void SaveLinkInVector(std::vector<std::pair<std::pair</*First Name*/std::string, /*First PIN*/std::string>, std::pair</*Second Name*/std::string, /*Second PIN*/std::string>>> &links, std::string line, std::vector<std::string> names)
+void nts::ParseFile::saveLinkInVector(std::string line, std::vector<std::string> &names)
 {
     std::string firstName = line.substr(0, line.find(":"));
     if (!checkName(names, firstName))
@@ -74,6 +74,7 @@ static void SaveLinkInVector(std::vector<std::pair<std::pair</*First Name*/std::
 }
 
 static void SaveShipsetInVector(std::vector<std::pair</*nts::IComponent **/std::string, std::string>> &components, std::string line, std::vector<std::string> *names)
+void nts::ParseFile::saveShipsetInVector(std::string line, std::vector<std::string> &names)
 {
     std::string componentName = line.substr(0, line.find(" "));
     if (!checkName(nts::type, componentName))
@@ -85,10 +86,11 @@ static void SaveShipsetInVector(std::vector<std::pair</*nts::IComponent **/std::
     //components.push_back(std::make_pair(CreateComponent(componentName), name));
 }
 
-static std::pair<std::vector<std::pair</*nts::IComponent **/std::string, std::string>>, std::vector<std::pair<std::pair</*First Name*/std::string, /*First PIN*/std::string>, std::pair</*Second Name*/std::string, /*Second PIN*/std::string>>>> ParseData(std::vector<std::string> fileContent)
+static bool isFlag(std::string line, nts::ParseState &state)
 {
     std::vector<std::pair</*nts::IComponent **/std::string, std::string>> components;
     std::vector<std::pair<std::pair</*First Name*/std::string, /*First PIN*/std::string>, std::pair</*Second Name*/std::string, /*Second PIN*/std::string>>> links;
+void nts::ParseFile::parseData(void) {
     nts::ParseState state = nts::ParseState::NONE;
     std::vector<std::string> names;
     names.push_back("end");
@@ -98,6 +100,7 @@ static std::pair<std::vector<std::pair</*nts::IComponent **/std::string, std::st
         if (line.find(".chipsets:") != std::string::npos) {
             state = nts::ParseState::CHIPSETS;
             continue;
+void nts::ParseFile::linkComponents(void)
         }
         if (line.find(".links:") != std::string::npos) {
             state = nts::ParseState::LINKS;
