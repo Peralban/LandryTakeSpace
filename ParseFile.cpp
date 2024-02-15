@@ -13,7 +13,7 @@ void nts::ParseFile::error_case(int ac, char **av)
 {
     if (ac != 2) {
         std::cerr << "Error: invalid number of arguments" << std::endl;
-        exit(84);
+        throw nts::Error("Invalid number of arguments");
     }
     if (std::string(av[1]) == "-h") {
         std::cout << "USAGE" << std::endl;
@@ -24,15 +24,15 @@ void nts::ParseFile::error_case(int ac, char **av)
     }
     if (std::string(av[1] + strlen(av[1]) - 4) != ".nts") {
         std::cerr << "Error: invalid file extension" << std::endl;
-        exit(84);
+        throw nts::Error("Invalid file extension");
     }
 }
 
 static std::vector<std::string> fileInVector(std::string fileName)
 {
     std::ifstream file(fileName);
-    std::vector<std::string> fileContent;
-    if (!file.is_open()) {
+    if (!file.is_open())
+        throw nts::Error("Could not open file");
         std::cerr << "Error: could not open file " << fileName << std::endl;
         exit(84);
     }
@@ -46,11 +46,11 @@ static std::vector<std::string> fileInVector(std::string fileName)
 void nts::ParseFile::checkName(std::vector<std::string> type, std::string name)
 {
     for (size_t i = 0; i < type.size(); i++) {
-        std::cout << type[i] << " " << name << std::endl;
+        std::cout << "checkName " << name << " " << type[i] << std::endl;
         if (name == type[i])
             return true;
         if (type[i] == "end") {
-            std::cerr << "Error: invalid component name" << std::endl;
+            throw nts::Error("Invalid component name");
             return false;
         }
     }
