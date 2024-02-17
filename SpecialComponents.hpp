@@ -10,17 +10,41 @@
 #include "AComponent.hpp"
 
 namespace nts {
-    class TrueComponent : public AComponent {
+    class SpecialComponent : public AComponent {
     public:
-        TrueComponent();
-        ~TrueComponent() = default;
+        SpecialComponent(nts::Tristate state = nts::Tristate::Undefined);
+        ~SpecialComponent() = default;
         nts::Tristate compute(std::size_t pin) override;
     };
 
-    class FalseComponent : public AComponent {
+    class TrueComponent : public SpecialComponent {
+    public:
+        TrueComponent();
+        ~TrueComponent() = default;
+    };
+
+    class FalseComponent : public SpecialComponent {
     public:
         FalseComponent();
         ~FalseComponent() = default;
+    };
+
+    class ClockComponent : public SpecialComponent {
+    public:
+        ClockComponent();
+        ~ClockComponent() = default;
+    };
+
+    class InputComponent : public SpecialComponent {
+    public:
+        InputComponent();
+        ~InputComponent() = default;
+    };
+
+    class OutputComponent : public AComponent {
+    public:
+        OutputComponent();
+        ~OutputComponent() = default;
         nts::Tristate compute(std::size_t pin) override;
     };
 }
