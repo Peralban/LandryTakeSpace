@@ -15,4 +15,11 @@ namespace nts {
         DFlipFlop();
         ~DFlipFlop() = default;
     };
+
+    // 4013 component: 2 DFlipFlop
+    class Component4013 : public AdvancedComponent {
+    public:
+        Component4013();
+        ~Component4013() = default;
+    };
 }
