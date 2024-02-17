@@ -7,7 +7,6 @@
 
 #pragma once
 
-#include <iostream>
 #include "IComponent.hpp"
 #include <vector>
 
