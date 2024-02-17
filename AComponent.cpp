@@ -15,7 +15,8 @@ nts::AComponent::AComponent(std::size_t nbPins, bool advanced)
     _advanced = advanced;
     _inputPins = std::vector<nts::Tristate>(nbPins, nts::Tristate::Undefined);
     _counter = 0; // infinity loop counter
-    _state = nts::Tristate::Undefined;
+    _state = std::vector<int>(nbPins + 1, 0);
+    _stateSet = std::vector<int>(nbPins + 1, 0);
 }
 
 void nts::AComponent::setLink(std::size_t pin, nts::IComponent *other, std::size_t otherPin)
@@ -33,11 +34,11 @@ void nts::AComponent::setLink(std::size_t pin, nts::IComponent *other, std::size
     if (isLinked(pin))
         throw nts::Error("Pin already linked (" + std::to_string(_links[pin - 1].first) + ", " + std::to_string(otherPin) + ")");
     _links[pin - 1] = std::make_pair(otherPin, other);
-    if (isAdvanced())
-        _internLink[pin - 1].second->setLink(_internLink[pin - 1].first, other, otherPin);
     try {
         other->setLink(otherPin, this, pin);
     } catch (nts::Error &e) {}
+    if (isAdvanced() && isInput(pin))
+        _internLink[pin - 1].second->setLink(_internLink[pin - 1].first, other, otherPin);
 }
 
 void nts::AComponent::setInternLink(std::size_t pin, nts::IComponent *other, std::size_t otherPin)
@@ -138,11 +139,29 @@ bool nts::AComponent::isLinked(std::size_t pin) const
     return _links[pin - 1].second != nullptr;
 }
 
+bool nts::AComponent::isInternLinked(std::size_t pin) const
+{
+    if (!isAdvanced())
+        throw nts::Error("Component has no internal link");
+    if (pin > _nbPins || pin == 0)
+        throw nts::Error("Pin index out of range");
+    return _internLink[pin - 1].second != nullptr;
+}
+
 nts::IComponent *nts::AComponent::linkedTo(std::size_t pin) const
 {
     if (pin > _nbPins || pin == 0)
         throw nts::Error("Pin index out of range");
     return _links[pin - 1].second;
+}
+
+nts::IComponent *nts::AComponent::internLinkedTo(std::size_t pin) const
+{
+    if (!isAdvanced())
+        throw nts::Error("Component has no internal link");
+    if (pin > _nbPins || pin == 0)
+        throw nts::Error("Pin index out of range");
+    return _internLink[pin - 1].second;
 }
 
 void nts::AComponent::checkInfinityCounter()
@@ -166,6 +185,84 @@ void nts::AComponent::resetInfinityCounter()
                 _internLink[i].second->resetInfinityCounter();
 }
 
+void nts::AComponent::clearStateSet(size_t pin)
+{
+    if (pin > _nbPins || pin == 0)
+        throw nts::Error("Pin index out of range");
+    if (isInput(pin)) {
+        _stateSet[pin] = 0;
+        if (isAdvanced()) {
+            if (isInput(pin) && internLinkedTo(pin) != nullptr)
+                internLinkedTo(pin)->clearStateSet(getOtherInternPin(pin));
+        }
+        for (std::size_t i = 1; i <= getNbPins(); i++) {
+            _stateSet[i] = 0;
+            if (isOutput(i) && _state[i] != compute(i)) {
+                clearStateSet(i);
+            }
+        }
+    }
+    if (isOutput(pin)) {
+        IComponent *linked = linkedTo(pin);
+        if (linked == nullptr)
+            return;
+        linkedTo(pin)->clearStateSet(getOtherPin(pin));
+    }
+    if (isUnused(pin))
+        throw nts::Error("Unused pin cannot be cleared");
+}
+
+int nts::AComponent::getState(std::size_t pin) const
+{
+    if (pin > _nbPins || pin == 0)
+        throw nts::Error("Pin index out of range");
+    return _state[pin];
+}
+
+void nts::AComponent::setState(std::size_t pin, nts::Tristate state)
+{
+    if (pin > _nbPins || pin == 0)
+        throw nts::Error("Pin index out of range");
+    _state[pin] = (int)state;
+}
+
+void nts::AComponent::setState(std::size_t pin, int state)
+{
+    if (pin > _nbPins || pin == 0)
+        throw nts::Error("Pin index out of range");
+    _state[pin] = state;
+}
+
+int nts::AComponent::getStateSet(std::size_t pin) const
+{
+    if (pin > _nbPins || pin == 0)
+        throw nts::Error("Pin index out of range");
+    return _stateSet[pin];
+}
+
+void nts::AComponent::setStateSet(std::size_t pin, int state)
+{
+    if (pin > _nbPins || pin == 0)
+        throw nts::Error("Pin index out of range");
+    _stateSet[pin] = state;
+}
+
+std::size_t nts::AComponent::getOtherPin(std::size_t pin) const
+{
+    if (pin > _nbPins || pin == 0)
+        throw nts::Error("Pin index out of range");
+    return _links[pin - 1].first;
+}
+
+std::size_t nts::AComponent::getOtherInternPin(std::size_t pin) const
+{
+    if (!isAdvanced())
+        throw nts::Error("Component has no internal link");
+    if (pin > _nbPins || pin == 0)
+        throw nts::Error("Pin index out of range");
+    return _internLink[pin - 1].first;
+}
+
 /*__________________________________________________________________________*/
 
 nts::Tristate nts::AdvancedComponent::compute(std::size_t pin)
@@ -173,8 +270,14 @@ nts::Tristate nts::AdvancedComponent::compute(std::size_t pin)
     checkInfinityCounter();
     if (isInput(pin))
         return getLink(pin);
-    else if (isOutput(pin))
-        return getInternLink(pin);
+    else if (isOutput(pin)) {
+        if (_stateSet[pin] == 1)
+            return (nts::Tristate)_state[pin];
+        nts::Tristate buff = getInternLink(pin);
+        _stateSet[pin] = 1;
+        _state[pin] = (int)buff;
+        return buff;
+    }
     else
         throw nts::Error("Pin index out of range");
 }

@@ -7,7 +7,6 @@
 
 #pragma once
 
-#include <iostream>
 #include "IComponent.hpp"
 #include <vector>
 
@@ -30,9 +29,19 @@ namespace nts {
         bool isUnused(std::size_t pin) const override;
         bool isAdvanced() const override;
         bool isLinked(std::size_t pin) const override;
+        bool isInternLinked(std::size_t pin) const override;
         nts::IComponent *linkedTo(std::size_t pin) const override;
+        nts::IComponent *internLinkedTo(std::size_t pin) const override;
         void checkInfinityCounter() override;
         void resetInfinityCounter() override;
+        void clearStateSet(size_t pin) override;
+        int getState(std::size_t pin) const override;
+        void setState(std::size_t pin, nts::Tristate state) override;
+        void setState(std::size_t pin, int state) override;
+        int getStateSet(std::size_t pin) const override;
+        void setStateSet(std::size_t pin, int state) override;
+        std::size_t getOtherPin(std::size_t pin) const override;
+        std::size_t getOtherInternPin(std::size_t pin) const override;
     protected:
         bool _advanced; // Advanced components have internal links to internal components
         std::size_t _nbPins;
@@ -40,7 +49,8 @@ namespace nts {
         std::vector<std::pair<std::size_t, nts::IComponent*>> _links;
         std::vector<std::pair<std::size_t, IComponent*>> _internLink;
         std::size_t _counter;
-        nts::Tristate _state;
+        std::vector<int> _state;
+        std::vector<int> _stateSet;
     };
 
     class AdvancedComponent : public AComponent {
