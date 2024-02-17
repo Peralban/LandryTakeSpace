@@ -25,7 +25,7 @@ void nts::ParseFile::checkName(std::vector<std::string> type, std::string name)
         if (name == type[i])
             return;
         if (type[i] == "end")
-            throw nts::Error("Invalid component name");
+            throw nts::Error("Invalid component name '" + name + "'");
     }
 }
 
@@ -62,7 +62,6 @@ void nts::ParseFile::saveShipsetInVector(std::string line, std::vector<std::stri
     names.push_back("end");
     std::unique_ptr<nts::IComponent> componentUnique = createComponent(componentName);
     nts::IComponent *component = componentUnique.release();
-    std::cout << component << std::endl;
     if (isInput(componentName)) {
         _nbInput++;
         _inputsVector.push_back(std::make_pair(component, name));
