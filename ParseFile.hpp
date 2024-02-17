@@ -85,6 +85,7 @@ namespace nts
         unsigned int getNbInput() { return _nbInput; }
         unsigned int getNbOutput() { return _nbOutput; }
 
+        static std::unique_ptr<nts::IComponent> createComponent(const std::string &type);
 
         void saveShipsetInVector(std::string line, std::vector<std::string> &names);
         void saveLinkInVector(std::string line, std::vector<std::string> &names);
