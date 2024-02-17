@@ -19,28 +19,33 @@ nts::AndGate::AndGate(std::size_t inputs) : nts::AComponent(inputs + 1)
 nts::Tristate nts::AndGate::compute(std::size_t pin)
 {
     checkInfinityCounter();
-    if (_state != nts::Tristate::Undefined)
-        return _state;
+    if (_stateSet[pin] == 1 || _stateSet[pin] == 2)
+        return (nts::Tristate)_state[pin];
 
     if (isOutput(pin)) {
         bool hasUndefined = false;
 
         for (std::size_t i = 1; i < _nbPins; i++) {
             nts::Tristate buff = getLink((i + _counter) % (_nbPins - 1) + 1);
-            if (_state != nts::Tristate::Undefined)
-                return _state;
+            if (_stateSet[pin] == 1)
+                return (nts::Tristate)_state[pin];
             if (buff == nts::Tristate::False) {
-                _state = nts::Tristate::False;
+                _stateSet[pin] = 1;
+                _state[pin] = nts::Tristate::False;
                 return nts::Tristate::False;
             }
-            if (buff == nts::Tristate::Undefined)
+            if (buff == nts::Tristate::Undefined) {
                 hasUndefined = true;
+                _stateSet[pin] = 2;
+            }
         }
         if (hasUndefined) {
-            _state = nts::Tristate::Undefined;
+            _stateSet[pin] = 1;
+            _state[pin] = nts::Tristate::Undefined;
             return nts::Tristate::Undefined;
         }
-        _state = nts::Tristate::True;
+        _stateSet[pin] = 1;
+        _state[pin] = nts::Tristate::True;
         return nts::Tristate::True;
     }
 
@@ -62,27 +67,32 @@ nts::OrGate::OrGate(std::size_t inputs) : nts::AComponent(inputs + 1)
 nts::Tristate nts::OrGate::compute(std::size_t pin)
 {
     checkInfinityCounter();
-    if (_state != nts::Tristate::Undefined)
-        return _state;
+    if (_stateSet[pin] == 2 || _stateSet[pin] == 1)
+        return (nts::Tristate)_state[pin];
 
     if (isOutput(pin)) {
         bool hasUndefined = false;
         for (std::size_t i = 1; i < _nbPins; i++) {
             nts::Tristate buff = getLink((i + _counter) % (_nbPins - 1) + 1);
-            if (_state != nts::Tristate::Undefined)
-                return _state;
+            if (_stateSet[pin] == 1)
+                return (nts::Tristate)_state[pin];
             if (buff == nts::Tristate::True) {
-                _state = nts::Tristate::True;
+                _stateSet[pin] = 1;
+                _state[pin] = nts::Tristate::True;
                 return nts::Tristate::True;
             }
-            if (buff == nts::Tristate::Undefined)
+            if (buff == nts::Tristate::Undefined) {
+                _stateSet[pin] = 2;
                 hasUndefined = true;
+            }
         }
         if (hasUndefined) {
-            _state = nts::Tristate::Undefined;
+            _stateSet[pin] = 1;
+            _state[pin] = nts::Tristate::Undefined;
             return nts::Tristate::Undefined;
         }
-        _state = nts::Tristate::False;
+        _stateSet[pin] = 1;
+        _state[pin] = nts::Tristate::False;
         return nts::Tristate::False;
     }
 
@@ -104,24 +114,26 @@ nts::XorGate::XorGate(std::size_t inputs) : nts::AComponent(inputs + 1)
 nts::Tristate nts::XorGate::compute(std::size_t pin)
 {
     checkInfinityCounter();
-    if (_state != nts::Tristate::Undefined)
-        return _state;
+    if (_stateSet[pin] == 1)
+        return (nts::Tristate)_state[pin];
 
     if (isOutput(pin)) {
         size_t nbTrue = 0;
 
         for (std::size_t i = 1; i < _nbPins; i++) {
             nts::Tristate buff = getLink((i + _counter) % (_nbPins - 1) + 1);
-            if (_state != nts::Tristate::Undefined)
-                return _state;
+            if (_stateSet[pin] == 1)
+                return (nts::Tristate)_state[pin];
             if (buff == nts::Tristate::Undefined) {
-                _state = nts::Tristate::Undefined;
+                _stateSet[pin] = 1;
+                _state[pin] = nts::Tristate::Undefined;
                 return nts::Tristate::Undefined;
             }
             if (buff == nts::Tristate::True)
                 nbTrue++;
         }
-        _state = nbTrue % 2 ? nts::Tristate::True : nts::Tristate::False;
+        _stateSet[pin] = 1;
+        _state[pin] = nbTrue % 2 ? nts::Tristate::True : nts::Tristate::False;
         return nbTrue % 2 ? nts::Tristate::True : nts::Tristate::False;
     }
     if (isInput(pin))
@@ -142,6 +154,8 @@ nts::Tristate nts::NotGate::compute(std::size_t pin)
     checkInfinityCounter();
     if (isOutput(pin)) {
         nts::Tristate buff = getLink(1);
+        _stateSet[pin] = 1;
+        _state[pin] = buff;
         if (buff == nts::Tristate::Undefined)
             return nts::Tristate::Undefined;
         return buff == nts::Tristate::True ? nts::Tristate::False : nts::Tristate::True;
@@ -208,7 +222,10 @@ nts::Splitter::Splitter(std::size_t outputs) : nts::AComponent(outputs + 1)
 nts::Tristate nts::Splitter::compute(std::size_t pin)
 {
     checkInfinityCounter();
-    if (isOutput(pin) || isInput(pin))
-        return getLink(1);
+    if (isOutput(pin) || isInput(pin)) {
+        _stateSet[pin] = 1;
+        _state[pin] = getLink(1);
+        return (nts::Tristate)_state[pin];
+    }
     throw nts::Error("Pin index out of range");
 }
