@@ -91,5 +91,39 @@ nts::DFlipFlop::DFlipFlop() : AdvancedComponent(6)
     // pin 2 is already used
     splitter[9]->setLink(3, nandGates[4], 3);
     splitter[9]->setUnused(4);
+}
 
+nts::Component4013::Component4013() : AdvancedComponent(14)
+{
+    setOutput(1);
+    setOutput(2);
+    setInput(3);
+    setInput(4);
+    setInput(5);
+    setInput(6);
+    setUnused(7);
+    setInput(8);
+    setInput(9);
+    setInput(10);
+    setInput(11);
+    setOutput(12);
+    setOutput(13);
+    setUnused(14);
+
+    std::vector < IComponent * > components(2);
+    components[0] = new DFlipFlop();
+    components[1] = new DFlipFlop();
+
+    setInternLink(1, components[0], 5);
+    setInternLink(2, components[0], 6);
+    setInternLink(3, components[0], 3);
+    setInternLink(4, components[0], 4);
+    setInternLink(5, components[0], 2);
+    setInternLink(6, components[0], 1);
+    setInternLink(13, components[1], 5);
+    setInternLink(12, components[1], 6);
+    setInternLink(11, components[1], 3);
+    setInternLink(10, components[1], 4);
+    setInternLink(9, components[1], 2);
+    setInternLink(8, components[1], 1);
 }
