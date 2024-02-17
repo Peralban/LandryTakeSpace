@@ -68,7 +68,6 @@ namespace nts
     public:
         ParseFile(void) : _nbInput(0), _nbOutput(0) {}
         ~ParseFile() = default;
-        void error_case(int ac, char **av);
         std::vector<std::string> fileInVector(void);
         void linkComponents(void);
         void parseData(void);

@@ -7,25 +7,6 @@
 
 #include "ParseFile.hpp"
 
-void nts::ParseFile::error_case(int ac, char **av)
-{
-    if (ac != 2) {
-        std::cerr << "Error: invalid number of arguments" << std::endl;
-        throw nts::Error("Invalid number of arguments");
-    }
-    if (std::string(av[1]) == "-h") {
-        std::cout << "USAGE" << std::endl;
-        std::cout << "    ./nanotekspice file.nts" << std::endl;
-        std::cout << "DESCRIPTION" << std::endl;
-        std::cout << "    file    file describing the circuit" << std::endl;
-        exit(0);
-    }
-    if (std::string(av[1] + strlen(av[1]) - 4) != ".nts") {
-        std::cerr << "Error: invalid file extension" << std::endl;
-        throw nts::Error("Invalid file extension");
-    }
-}
-
 std::vector<std::string> nts::ParseFile::fileInVector(void)
 {
     std::ifstream file(_fileName);
