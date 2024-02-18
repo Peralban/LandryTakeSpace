@@ -6,6 +6,7 @@
 */
 
 #include "ParseFile.hpp"
+#include <regex>
 
 std::vector<std::string> nts::ParseFile::fileInVector(void)
 {
@@ -25,7 +26,7 @@ void nts::ParseFile::checkName(std::vector<std::string> type, std::string name)
         if (name == type[i])
             return;
         if (type[i] == "end")
-            throw nts::Error("Invalid component name '" + name + "'");
+            throw nts::Error("Unknow component name '" + name + "'");
     }
 }
 
@@ -38,7 +39,7 @@ void nts::ParseFile::saveLinkInVector(std::string line, std::vector<std::string>
     line = line.substr(line.find(" ") + 1);
     std::string secondName = line.substr(0, line.find(":"));
     checkName(names, secondName);
-    line = line.substr(line.find(":") + 1);
+    line = line.substr(line.find(":") + 1, line.find(" "));
     std::string secondPin = line;
     _links.push_back(std::make_pair(std::make_pair(firstName, firstPin), std::make_pair(secondName, secondPin)));
 }
@@ -55,8 +56,9 @@ static bool isInput(std::string name)
 void nts::ParseFile::saveShipsetInVector(std::string line, std::vector<std::string> &names)
 {
     std::string componentName = line.substr(0, line.find(" "));
+    line = line.substr(line.find(" ") + 1);
     checkName(nts::type, componentName);
-    std::string name = line.substr(line.find(" ") + 1);
+    std::string name = line.substr(0, line.find(" "));
     names.pop_back();
     names.push_back(name);
     names.push_back("end");
@@ -84,6 +86,21 @@ static bool isFlag(std::string line, nts::ParseState &state)
     return false;
 }
 
+static void checkLine(std::string line, nts::ParseState state)
+{
+    std::regex reg;
+
+    if (state == nts::ParseState::CHIPSETS) {
+        reg = std::regex("^[\\w]+ [\\w]+( #.*)?$");
+    } else if (state == nts::ParseState::LINKS) {
+        reg = std::regex("^[\\w]+:[\\d]+ [\\w]+:[\\d]+( #.*)?$");
+    }
+    if (!std::regex_match(line, reg)) {
+        throw nts::Error("Invalid line");
+    }
+}
+
+
 void nts::ParseFile::parseData(void) {
     nts::ParseState state = nts::ParseState::NONE;
     std::vector <std::string> names;
@@ -93,6 +110,7 @@ void nts::ParseFile::parseData(void) {
             continue;
         if (isFlag(line, state))
             continue;
+        checkLine(line, state);
         if (state != nts::ParseState::NONE)
             (this->*SaveInVector[state])(line, names);
     }
