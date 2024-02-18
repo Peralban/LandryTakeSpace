@@ -12,13 +12,18 @@ SRC	=	AComponent.cpp	\
 		ParseFile.cpp	\
 		SpecialComponents.cpp	\
 		NanotekSpice.cpp	\
-		Main.cpp
+		main.cpp
 
 OBJ	=	$(SRC:.cpp=.o)
 
 NAME	=	nanotekspice
 
 CXXFLAGS	=	-Wall -Wextra -Wshadow -I./include
+
+TESTSRC	=	$(filter-out main.cpp, $(SRC)) \
+			Test/Test_main.cpp				\
+			Test/TestParsing.cpp			\
+
 
 all:	$(NAME)
 
@@ -32,3 +37,7 @@ fclean:	clean
 	rm -f $(NAME)
 
 re:	fclean all
+
+tests_run:
+	g++ -o unit_tests $(TESTSRC) $(CXXFLAGS) --coverage -lcriterion
+	./unit_tests

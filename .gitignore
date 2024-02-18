@@ -6,3 +6,4 @@ Main.cpp
 *.out
 nts*
 B-OOP-400_nanotekspice
+unit_tests*
