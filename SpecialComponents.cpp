@@ -47,23 +47,29 @@ nts::TrueComponent::TrueComponent() : SpecialComponent(nts::Tristate::True)
 {
     for (std::size_t i = 2; i <= 5; i++)
         setUnused(i);
+    _state[1] = nts::Tristate::True;
 }
 
 nts::FalseComponent::FalseComponent() : SpecialComponent(nts::Tristate::False)
 {
     for (std::size_t i = 2; i <= 5; i++)
         setUnused(i);
+    _state[1] = nts::Tristate::False;
 }
 
 /*-----------------CLOCK COMPONENT-----------------*/
 
-nts::ClockComponent::ClockComponent() : SpecialComponent(nts::Tristate::Undefined) {}
+nts::ClockComponent::ClockComponent() : SpecialComponent(nts::Tristate::Undefined)
+{
+    _state[1] = nts::Tristate::Undefined;
+}
 
 /*-----------------INPUT COMPONENT-----------------*/
 
 nts::InputComponent::InputComponent() : SpecialComponent(nts::Tristate::Undefined)
 {
     setUnused(5);
+    _state[1] = nts::Tristate::Undefined;
 }
 
 /*-----------------OUTPUT COMPONENT-----------------*/

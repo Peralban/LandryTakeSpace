@@ -7,25 +7,6 @@
 
 #include "ParseFile.hpp"
 
-void nts::ParseFile::error_case(int ac, char **av)
-{
-    if (ac != 2) {
-        std::cerr << "Error: invalid number of arguments" << std::endl;
-        throw nts::Error("Invalid number of arguments");
-    }
-    if (std::string(av[1]) == "-h") {
-        std::cout << "USAGE" << std::endl;
-        std::cout << "    ./nanotekspice file.nts" << std::endl;
-        std::cout << "DESCRIPTION" << std::endl;
-        std::cout << "    file    file describing the circuit" << std::endl;
-        exit(0);
-    }
-    if (std::string(av[1] + strlen(av[1]) - 4) != ".nts") {
-        std::cerr << "Error: invalid file extension" << std::endl;
-        throw nts::Error("Invalid file extension");
-    }
-}
-
 std::vector<std::string> nts::ParseFile::fileInVector(void)
 {
     std::ifstream file(_fileName);
@@ -44,7 +25,7 @@ void nts::ParseFile::checkName(std::vector<std::string> type, std::string name)
         if (name == type[i])
             return;
         if (type[i] == "end")
-            throw nts::Error("Invalid component name");
+            throw nts::Error("Invalid component name '" + name + "'");
     }
 }
 
@@ -81,7 +62,6 @@ void nts::ParseFile::saveShipsetInVector(std::string line, std::vector<std::stri
     names.push_back("end");
     std::unique_ptr<nts::IComponent> componentUnique = createComponent(componentName);
     nts::IComponent *component = componentUnique.release();
-    std::cout << component << std::endl;
     if (isInput(componentName)) {
         _nbInput++;
         _inputsVector.push_back(std::make_pair(component, name));
@@ -135,4 +115,47 @@ void nts::ParseFile::linkComponents(void)
             }
         }
     }
+}
+
+std::unique_ptr<nts::IComponent> nts::ParseFile::createComponent(const std::string &type)
+{
+    if (type == "and")
+        return std::unique_ptr<nts::IComponent>(new nts::AndGate());
+    else if (type == "or")
+        return std::unique_ptr<nts::IComponent>(new nts::OrGate());
+    else if (type == "xor")
+        return std::unique_ptr<nts::IComponent>(new nts::XorGate());
+    else if (type == "not")
+        return std::unique_ptr<nts::IComponent>(new nts::NotGate());
+    else if (type == "nand")
+        return std::unique_ptr<nts::IComponent>(new nts::NAndGate());
+    else if (type == "nor")
+        return std::unique_ptr<nts::IComponent>(new nts::NOrGate());
+    else if (type == "nxor")
+        return std::unique_ptr<nts::IComponent>(new nts::NXorGate());
+    else if (type == "splitter")
+        return std::unique_ptr<nts::IComponent>(new nts::Splitter());
+    else if (type == "true")
+        return std::unique_ptr<nts::IComponent>(new nts::TrueComponent());
+    else if (type == "false")
+        return std::unique_ptr<nts::IComponent>(new nts::FalseComponent());
+    else if (type == "4081")
+        return std::unique_ptr<nts::IComponent>(new nts::Component4081());
+    else if (type == "4071")
+        return std::unique_ptr<nts::IComponent>(new nts::Component4071());
+    else if (type == "4069")
+        return std::unique_ptr<nts::IComponent>(new nts::Component4069());
+    else if (type == "4030")
+        return std::unique_ptr<nts::IComponent>(new nts::Component4030());
+    else if (type == "4011")
+        return std::unique_ptr<nts::IComponent>(new nts::Component4011());
+    else if (type == "4001")
+        return std::unique_ptr<nts::IComponent>(new nts::Component4001());
+    else if (type == "input")
+        return std::unique_ptr<nts::IComponent>(new nts::InputComponent());
+    else if (type == "output")
+        return std::unique_ptr<nts::IComponent>(new nts::OutputComponent());
+    else if (type == "clock")
+        return std::unique_ptr<nts::IComponent>(new nts::ClockComponent());
+    throw nts::Error("Component not found");
 }
