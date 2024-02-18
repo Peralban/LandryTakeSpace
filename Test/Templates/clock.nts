@@ -3,7 +3,7 @@
 # CLOCK ---> OUTPUT
 
 .chipsets:
-clock cl
+ouioui cl
 output out
 
 .links:

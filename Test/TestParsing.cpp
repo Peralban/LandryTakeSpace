@@ -179,3 +179,63 @@ Test(Parsing, Parsing8)
         ac++;
     cr_assert_eq(ac, 2);
 }
+
+Test(Parsing, Parsing9)
+{
+    nts::ParseFile parsing;
+    std::string ac = "Other pin index out of range";
+    std::string ac2;
+    try {
+        parsing.setFileName("Test/Templates/xor.nts");
+        parsing.fileInVector();
+        parsing.parseData();
+        parsing.linkComponents();
+    } catch (nts::Error &e) {
+        ac2 = e.what();
+    }
+    cr_assert_eq(ac, ac2);
+}
+Test(Parsing, Parsing10)
+{
+    nts::ParseFile parsing;
+    std::string ac = "Pin index out of range";
+    std::string ac2;
+    try {
+        parsing.setFileName("Test/Templates/not.nts");
+        parsing.fileInVector();
+        parsing.parseData();
+        parsing.linkComponents();
+    } catch (nts::Error &e) {
+        ac2 = e.what();
+    }
+    cr_assert_eq(ac, ac2);
+}
+
+Test(Parsing, Parsing11)
+{
+    nts::ParseFile parsing;
+    std::string ac = "Unknow component name 'ouioui'";
+    std::string ac2;
+    try {
+        parsing.setFileName("Test/Templates/clock.nts");
+        parsing.fileInVector();
+        parsing.parseData();
+    } catch (nts::Error &e) {
+        ac2 = e.what();
+    }
+    cr_assert_str_eq(ac.c_str(), ac2.c_str());
+}
+Test(Parsing, Parsing12)
+{
+    nts::ParseFile parsing;
+    std::string ac = "Invalid line";
+    std::string ac2;
+    try {
+        parsing.setFileName("Test/Templates/false.nts");
+        parsing.fileInVector();
+        parsing.parseData();
+    } catch (nts::Error &e) {
+        ac2 = e.what();
+    }
+    cr_assert_str_eq(ac.c_str(), ac2.c_str());
+}
