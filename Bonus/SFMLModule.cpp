@@ -31,8 +31,8 @@ nts::SFMLModule::SFMLModule(componentAndNameInVector &component,
         }
     }
     createInputGates(inputs, INPUT);
-    createOutputGates(outputs, OUTPUT);
     createGates(component, GATE);
+    createOutputGates(outputs, OUTPUT);
 }
 
 void nts::SFMLModule::createWindow()
@@ -76,7 +76,9 @@ void nts::SFMLModule::display()
             input.first.getRectangle().setFillColor(sf::Color(128, 128, 128, 255));
         input.second.first->resetInfinityCounter();
         _window.draw(input.first.getRectangle());
+        std::cout << "no1" << std::endl;
         _window.draw(input.first.getText());
+        std::cout << "no2" << std::endl;
     }
     for (auto &output : _outputGates) {
         nts::Tristate state = output.second.first->compute(1);
@@ -109,30 +111,47 @@ void nts::SFMLModule::display()
 
 nts::SFMLGates::SFMLGates(std::string name, Type type, sf::VideoMode _videoMode)
 {
-    static int x = 0;
-    static int y = 0;
-    static int stape = 0;
+    static unsigned int x = 0;
+    static unsigned int y = 0;
+    static unsigned int stape = 0;
+    if (!_font.loadFromFile("Fonts/Montserrat-Regular.ttf")) // "Fonts/Montserrat-Regular.ttf"
+        throw std::runtime_error("Error: Font not found");
     // if it's an input the gate has to be on the left side of the window
     if (type == INPUT) {
-        x = 0;
-        y += 125;
-    } else if (type == OUTPUT) {
         if (stape == 0) {
-            x = 1700;
+            x = 0;
             y = 0;
             stape = 1;
         } else {
-            x = 1700;
             y += 125;
+            if (y > _videoMode.height) {
+                y = 0;
+                x += 200;
+            }
         }
-    } else {
-        if (stape == 0) {
-            x = (1920 / 2);
+    } else if (type == GATE) {
+        if (stape == 1) {
+            x += 200;
             y = 0;
-            stape = 1;
+            stape = 2;
         } else {
-            x = (1920 / 2);
             y += 125;
+            if (y > _videoMode.height) {
+                y = 0;
+                x += 200;
+            }
+        }
+    } else if (type == OUTPUT) {
+        if (stape == 2) {
+            x += 200;
+            y = 0;
+            stape = 3;
+        } else {
+            y += 125;
+            if (y > _videoMode.height) {
+                y = 0;
+                x += 200;
+            }
         }
     }
     _rectangle.setSize(sf::Vector2f(100, 100));
@@ -140,8 +159,9 @@ nts::SFMLGates::SFMLGates(std::string name, Type type, sf::VideoMode _videoMode)
     _rectangle.setOutlineColor(sf::Color::Black);
     _rectangle.setOutlineThickness(2);
     _rectangle.setPosition(x, y);
+    _text.setFont(_font);
     _text.setString(name);
     _text.setCharacterSize(24);
     _text.setFillColor(sf::Color::Black);
-    _text.setPosition(_rectangle.getPosition().x + 25, _rectangle.getPosition().y + 25);
+    _text.setPosition(x + 25, y + 25);
 }

@@ -37,6 +37,7 @@ namespace nts {
     private:
         sf::RectangleShape _rectangle;
         sf::Text _text;
+        sf::Font _font;
     };
 
     class SFMLModule {

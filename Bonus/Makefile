@@ -19,7 +19,7 @@ OBJ	=	$(SRC:.cpp=.o)
 
 NAME	=	nanotekspice
 
-CXXFLAGS	=	-Wall -Wextra -Wshadow -I./include $(SFML)
+CXXFLAGS	=	-Wall -Wextra -Wshadow -I./include $(SFML) -g
 
 SFML	=	-lsfml-graphics -lsfml-window -lsfml-system
 

@@ -147,7 +147,6 @@ void nts::NanotekSpice::execShell(nts::SFMLModule &sfmlModule)
             std::thread sfmlthread(&runSfml, std::ref(sfmlModule), std::ref(smflIsRunning));
             sfmlthread.detach();
         } else if (line == "exit sfml") {
-            //end thread
             sfmlModule.getWindow().close();
             if (smflIsRunning)
                 smflIsRunning = false;
