@@ -12,14 +12,17 @@
 namespace nts {
     class NanotekSpice {
     public:
-        NanotekSpice(nts::allInputAndNameInVector Inputs, nts::allOutputAndNameInVector Outputs) :
-            _inputs(Inputs), _outputs(Outputs), _tick(0) {}
+        NanotekSpice(nts::allInputAndNameInVector Inputs,
+                     nts::allOutputAndNameInVector Outputs, nts::componentAndNameInVector Components) :
+            _inputs(Inputs), _outputs(Outputs), _components(Components), _tick(0) {}
         ~NanotekSpice() = default;
         void execShell();
+        void resetAllInfinitCounter();
     private:
         std::vector<std::pair<std::string, std::string>> _saveValue;
         nts::allInputAndNameInVector _inputs;
         nts::allOutputAndNameInVector _outputs;
+        nts::componentAndNameInVector _components;
         size_t _tick;
     };
 }

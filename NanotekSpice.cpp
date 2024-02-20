@@ -102,6 +102,7 @@ void nts::NanotekSpice::execShell()
         } else if (line == "simulate") {
             try {
                 simulate(_inputs, _outputs, _tick, _saveValue);
+                resetAllInfinitCounter();
             } catch (nts::Error &e) {
                 std::cerr << e.what() << std::endl;
             }
@@ -112,4 +113,10 @@ void nts::NanotekSpice::execShell()
         }
         std::cout << "> ";
     }
+}
+
+void nts::NanotekSpice::resetAllInfinitCounter()
+{
+    for (auto &component : _components)
+        component.first->resetInfinityCounter();
 }
