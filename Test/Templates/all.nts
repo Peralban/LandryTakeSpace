@@ -1,0 +1,49 @@
+# Basic XOR logic gate
+#
+# in_1  -1-+---\
+#          |xor |-3- out
+# in_2  -2-+---/
+
+.chipsets:
+input in_1
+and an_1
+or or_1
+xor xo_1
+not no_1
+true tr_1
+false fa_1
+4081 ga_1
+4071 ga_2
+4069 ga_3
+4030 ga_4
+4011 ga_5
+4001 ga_6
+output out
+clock cl_1
+4008 di_1
+4013 di_2
+output out_2
+output out_3
+
+.links:
+in_1:1 an_1:1
+in_1:2 an_1:2
+an_1:3 or_1:1
+in_1:1 xo_1:1
+in_1:2 xo_1:2
+xo_1:3 or_1:2
+in_1:1 no_1:1
+no_1:2 or_1:3
+tr_1:1 or_1:4
+fa_1:1 or_1:5
+or_1:6 ga_1:1
+or_1:7 ga_2:1
+or_1:8 ga_3:1
+or_1:9 ga_4:1
+or_1:10 ga_5:1
+or_1:11 ga_6:1
+or_1:12 out:1
+cl_1:1 di_1:1
+cl_1:2 di_2:1
+di_1:13 out_2:1
+di_2:14 out_3:1
