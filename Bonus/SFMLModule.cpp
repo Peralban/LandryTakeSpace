@@ -115,24 +115,24 @@ nts::SFMLGates::SFMLGates(std::string name, Type type, sf::VideoMode _videoMode)
     // if it's an input the gate has to be on the left side of the window
     if (type == INPUT) {
         x = 0;
-        y += 125 / _videoMode.height;
+        y += 125;
     } else if (type == OUTPUT) {
         if (stape == 0) {
-            x = 1700 / _videoMode.width;
+            x = 1700;
             y = 0;
             stape = 1;
         } else {
-            x = 1700 / _videoMode.width;
-            y += 125 / _videoMode.height;
+            x = 1700;
+            y += 125;
         }
     } else {
         if (stape == 0) {
-            x = (1920 / 2) / _videoMode.width;
+            x = (1920 / 2);
             y = 0;
             stape = 1;
         } else {
-            x = (1920 / 2) / _videoMode.width;
-            y += 125 / _videoMode.height;
+            x = (1920 / 2);
+            y += 125;
         }
     }
     _rectangle.setSize(sf::Vector2f(100, 100));

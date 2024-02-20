@@ -11,6 +11,10 @@
 #include "SFMLModule.hpp"
 
 namespace nts {
+    enum CMDTYPE {
+        KNOWN,
+        UNKOWN
+    };
     class NanotekSpice {
     public:
         NanotekSpice(nts::allInputAndNameInVector Inputs, nts::allOutputAndNameInVector Outputs) :

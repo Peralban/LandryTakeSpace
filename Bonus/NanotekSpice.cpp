@@ -83,9 +83,10 @@ static void simulate(nts::allInputAndNameInVector Inputs, nts::allOutputAndNameI
     saveValue.clear();
 }
 
-static void runSfml(nts::SFMLModule &sfmlModule)
+static void runSfml(nts::SFMLModule &sfmlModule, bool &smflIsRunning)
 {
     sfmlModule.createWindow();
+    smflIsRunning = true;
     while (sfmlModule.getWindow().isOpen()) {
         while (sfmlModule.getWindow().pollEvent(sfmlModule.getEvent())) {
             if (sfmlModule.getEvent().type == sf::Event::Closed) {
@@ -95,12 +96,24 @@ static void runSfml(nts::SFMLModule &sfmlModule)
         sfmlModule.getWindow().clear(sf::Color::White);
         sfmlModule.display();
     }
+    smflIsRunning = false;
+}
+
+static void printUserInput(nts::CMDTYPE type, std::string errorMessage = "")
+{
+    if (type == nts::CMDTYPE::KNOWN) {
+        std::cout << "\033[1;32m" << "❯ " << "\033[0m";
+    } else {
+        std::cerr << "\033[1;31m" << errorMessage << "\033[0m" << std::endl;
+        std::cout << "\033[1;31m" << "❯ " << "\033[0m";
+    }
 }
 
 void nts::NanotekSpice::execShell(nts::SFMLModule &sfmlModule)
 {
     std::string line;
-    std::cout << "> ";
+    printUserInput(nts::CMDTYPE::KNOWN);
+    bool smflIsRunning = false;
     while (getline(std::cin, line)) {
         if (line.empty())
             continue;
@@ -109,11 +122,10 @@ void nts::NanotekSpice::execShell(nts::SFMLModule &sfmlModule)
                 checkExistence(_inputs, line);
                 _saveValue.push_back(std::make_pair(line.substr(0, line.find("=")),
                                                     line.substr(line.find("=") + 1)));
-                std::cout << "> ";
+                printUserInput(nts::CMDTYPE::KNOWN);
                 continue;
             } catch (nts::Error &e) {
-                std::cerr << e.what() << std::endl;
-                std::cout << "> ";
+                printUserInput(nts::CMDTYPE::UNKOWN, e.what());
                 continue;
             }
         } if (line == "display") {
@@ -122,18 +134,29 @@ void nts::NanotekSpice::execShell(nts::SFMLModule &sfmlModule)
             try {
                 simulate(_inputs, _outputs, _tick, _saveValue);
             } catch (nts::Error &e) {
-                std::cerr << e.what() << std::endl;
+                printUserInput(nts::CMDTYPE::UNKOWN, e.what());
+                continue;
             }
         } else if (line == "exit") {
             exit(0);
         } else if (line == "sfml") {
-            std::thread sfmlthread(&runSfml, std::ref(sfmlModule));
+            if (smflIsRunning) {
+                printUserInput(nts::CMDTYPE::UNKOWN, "Error: sfml is already running");
+                continue;
+            }
+            std::thread sfmlthread(&runSfml, std::ref(sfmlModule), std::ref(smflIsRunning));
             sfmlthread.detach();
         } else if (line == "exit sfml") {
-            sfmlModule.destroyWindow();
+            //end thread
+            sfmlModule.getWindow().close();
+            if (smflIsRunning)
+                smflIsRunning = false;
+        } else if (line == "clear") {
+            system("clear");
         } else {
-            std::cerr << "Error: invalid command" << std::endl;
+            printUserInput(nts::CMDTYPE::UNKOWN, "Error: unknown command");
+            continue;
         }
-        std::cout << "> ";
+        printUserInput(nts::CMDTYPE::KNOWN);
     }
 }
