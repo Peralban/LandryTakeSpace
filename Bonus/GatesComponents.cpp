@@ -26,8 +26,8 @@ static nts::IComponent *createComponent(std::string type)
         return new nts::NAndGate();
     if (type == "nor")
         return new nts::NOrGate();
-    if (type == "nxor")
-        return new nts::NXorGate();
+    if (type == "xnor")
+        return new nts::XNorGate();
     if (type == "splitter")
         return new nts::Splitter();
     if (type == "true")
@@ -50,7 +50,7 @@ nts::FourGates::FourGates(std::string name) : AdvancedComponent(14)
     setOutput(10);
     setOutput(11);
 
-    if (name != "and" && name != "or" && name != "xor" && name != "nand" && name != "nor" && name != "nxor")
+    if (name != "and" && name != "or" && name != "xor" && name != "nand" && name != "nor" && name != "xnor")
         throw nts::Error("Invalid gate type");
 
     // may change the way of doing this

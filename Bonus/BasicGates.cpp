@@ -134,6 +134,7 @@ nts::Tristate nts::XorGate::compute(std::size_t pin)
         }
         _stateSet[pin] = 1;
         _state[pin] = nbTrue % 2 ? nts::Tristate::True : nts::Tristate::False;
+        std::cout << "XOR GATE: " << _state[pin] << std::endl;
         return nbTrue % 2 ? nts::Tristate::True : nts::Tristate::False;
     }
     if (isInput(pin))
@@ -153,12 +154,11 @@ nts::Tristate nts::NotGate::compute(std::size_t pin)
 {
     checkInfinityCounter();
     if (isOutput(pin)) {
-        nts::Tristate buff = getLink(1);
+        _state[pin] = getLink(1);
         _stateSet[pin] = 1;
-        _state[pin] = buff;
-        if (buff == nts::Tristate::Undefined)
+        if (_state[pin] == nts::Tristate::Undefined)
             return nts::Tristate::Undefined;
-        return buff == nts::Tristate::True ? nts::Tristate::False : nts::Tristate::True;
+        return _state[pin] == nts::Tristate::True ? nts::Tristate::False : nts::Tristate::True;
     }
     if (isInput(pin))
         return getLink(pin);
@@ -197,7 +197,7 @@ nts::NOrGate::NOrGate(std::size_t inputs) : nts::AdvancedComponent(inputs + 1)
 
 /*-----------------NXOR GATE-----------------*/
 
-nts::NXorGate::NXorGate(std::size_t inputs) : nts::AdvancedComponent(inputs + 1)
+nts::XNorGate::XNorGate(std::size_t inputs) : nts::AdvancedComponent(inputs + 1)
 {
     IComponent *xorGate = new XorGate(inputs);
     IComponent *notGate = new NotGate();

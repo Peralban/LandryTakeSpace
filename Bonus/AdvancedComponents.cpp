@@ -8,6 +8,8 @@
 #include "AdvancedComponents.hpp"
 #include "BasicGates.hpp"
 
+/*-----------------D FLIP FLOP-----------------*/
+
 nts::DFlipFlop::DFlipFlop() : AdvancedComponent(6)
 {
     setInput(1); // SET
@@ -93,6 +95,8 @@ nts::DFlipFlop::DFlipFlop() : AdvancedComponent(6)
     splitter[9]->setUnused(4);
 }
 
+/*-----------------4013-----------------*/
+
 nts::Component4013::Component4013() : AdvancedComponent(14)
 {
     setOutput(1);
@@ -126,4 +130,231 @@ nts::Component4013::Component4013() : AdvancedComponent(14)
     setInternLink(10, components[1], 4);
     setInternLink(9, components[1], 2);
     setInternLink(8, components[1], 1);
+}
+
+/*------------------SUM COMPONENT------------------*/
+
+nts::SumComponent::SumComponent() : AdvancedComponent(7)
+{
+    setInput(1);
+    setInput(2);
+    setOutput(3);
+    setOutput(4);
+    setInput(5);
+    setOutput(6);
+    setOutput(7);
+
+    std::vector<IComponent *> orGates(3);
+    for (std::size_t i = 0; i < 3; i++)
+        orGates[i] = new OrGate();
+    std::vector<IComponent *> andGates(2);
+    for (std::size_t i = 0; i < 2; i++)
+        andGates[i] = new AndGate();
+    IComponent *notGate = new NotGate();
+    IComponent *xnorGate = new XNorGate();
+    IComponent *tmpXNorGate = new XNorGate();
+    std::vector<IComponent *> splitter(5);
+    for (std::size_t i = 0; i < 5; i++)
+        splitter[i] = new Splitter(3);
+
+    setInternLink(1, splitter[0], 1);
+    setInternLink(2, splitter[1], 1);
+    setInternLink(3, splitter[2], 2);
+    setInternLink(4, splitter[3], 2);
+    setInternLink(5, splitter[4], 1);
+    setInternLink(6, xnorGate, 3);
+    setInternLink(7, orGates[1], 3);
+    // all internal links are set
+
+    // splitter[0] pin 1 is already used
+    splitter[0]->setLink(2, orGates[0], 1);
+    splitter[0]->setLink(3, andGates[0], 1);
+    //splitter[0]->setUnused(4); // replaced by the next line
+    splitter[0]->setLink(4, tmpXNorGate, 1);
+
+    // splitter[1] pin 1 is already used
+    splitter[1]->setLink(2, orGates[0], 2);
+    splitter[1]->setLink(3, andGates[0], 2);
+    //splitter[1]->setUnused(4); // replaced by the next line
+    splitter[1]->setLink(4, tmpXNorGate, 2);
+
+    splitter[2]->setLink(1, andGates[0], 3);
+    // splitter[2] pin 2 is already used
+    splitter[2]->setLink(3, orGates[1], 2);
+    splitter[2]->setLink(4, orGates[2], 2);
+
+    splitter[3]->setLink(1, orGates[0], 3);
+    // splitter[3] pin 2 is already used
+    splitter[3]->setLink(3, andGates[1], 2);
+    splitter[3]->setLink(4, notGate, 1);
+
+    // splitter[4] pin 1 is already used
+    splitter[4]->setLink(2, andGates[1], 1);
+    splitter[4]->setLink(3, xnorGate, 1);
+    splitter[4]->setUnused(4);
+
+    // andGates[0] all pins are already used
+
+    // andGates[1] pin 1 is already used
+    // andGates[1] pin 2 is already used
+    andGates[1]->setLink(3, orGates[1], 1);
+
+    // orGates[0] all pins are already used
+
+    // orGates[1] all pins are already used
+
+    orGates[2]->setLink(1, notGate, 2);
+    // orGates[2] pin 2 is already used
+    //orGates[2]->setLink(3, xnorGate, 2); // replaced by the next line
+    orGates[2]->setUnused(3);
+
+    // notGates all pins are already used
+
+    // xnorGate all pins are already used
+
+    // tmpXNorGate new link
+    tmpXNorGate->setLink(3, xnorGate, 2);
+}
+
+/*-----------------High Speed Par Carry-----------------*/
+
+nts::HighSpeedParCarry::HighSpeedParCarry() : AdvancedComponent(10)
+{
+    for (std::size_t i = 1; i <= 9; i++)
+        setInput(i);
+    setOutput(10);
+
+    std::vector<IComponent *> andGates(5);
+    andGates[0] = new AndGate(4);
+    andGates[1] = new AndGate(2);
+    andGates[2] = new AndGate(3);
+    andGates[3] = new AndGate(4);
+    andGates[4] = new AndGate(2);
+
+    std::vector<IComponent *> orGates(2);
+    orGates[0] = new OrGate(4);
+    orGates[1] = new OrGate(2);
+
+    std::vector<IComponent *> splitter(3);
+    for (std::size_t i = 0; i < 3; i++)
+        splitter[i] = new Splitter(4 - i);
+
+    setInternLink(1, orGates[0], 1);
+    setInternLink(2, splitter[0], 1);
+    setInternLink(3, andGates[1], 2);
+    setInternLink(4, splitter[1], 1);
+    setInternLink(5, andGates[2], 3);
+    setInternLink(6, splitter[2], 1);
+    setInternLink(7, andGates[3], 4);
+    setInternLink(8, andGates[0], 4);
+    setInternLink(9, andGates[4], 1);
+    setInternLink(10, orGates[1], 3);
+    // all internal links are set
+
+    // splitter[0] pin 1 is already used
+    splitter[0]->setLink(2, andGates[0], 1);
+    splitter[0]->setLink(3, andGates[1], 1);
+    splitter[0]->setLink(4, andGates[2], 1);
+    splitter[0]->setLink(5, andGates[3], 1);
+
+    // splitter[1] pin 1 is already used
+    splitter[1]->setLink(2, andGates[0], 2);
+    splitter[1]->setLink(3, andGates[2], 2);
+    splitter[1]->setLink(4, andGates[3], 2);
+
+    // splitter[2] pin 1 is already used
+    splitter[2]->setLink(2, andGates[0], 3);
+    splitter[2]->setLink(3, andGates[3], 3);
+
+    // andGates[0] all inputs are already used
+    andGates[0]->setLink(5, andGates[4], 2);
+
+    // andGates[1] all inputs are already used
+    andGates[1]->setLink(3, orGates[0], 2);
+
+    // andGates[2] all inputs are already used
+    andGates[2]->setLink(4, orGates[0], 3);
+
+    // andGates[3] all inputs are already used
+    andGates[3]->setLink(5, orGates[0], 4);
+
+    // andGates[4] all inputs are already used
+    andGates[4]->setLink(3, orGates[1], 1);
+
+    // orGates[0] all inputs are already used
+    orGates[0]->setLink(5, orGates[1], 2);
+
+    // orGates[1] all pins are already used
+}
+
+/*-----------------4008-----------------*/
+
+nts::Component4008::Component4008() : AdvancedComponent(16)
+{
+    for (std::size_t i = 1; i <= 9; i++)
+        setInput(i);
+    setUnused(8);
+    for (std::size_t i = 10; i <= 14; i++)
+        setOutput(i);
+    setInput(15);
+    setUnused(16);
+
+    std::vector<IComponent *> sumComponents(4);
+    for (std::size_t i = 0; i < 4; i++)
+        sumComponents[i] = new SumComponent();
+    IComponent *highSpeedParCarry = new HighSpeedParCarry();
+    IComponent *splitter = new Splitter(2);
+
+    setInternLink(15, sumComponents[3], 1);
+    setInternLink(1, sumComponents[3], 2);
+    setInternLink(2, sumComponents[2], 1);
+    setInternLink(3, sumComponents[2], 2);
+    setInternLink(4, sumComponents[1], 1);
+    setInternLink(5, sumComponents[1], 2);
+    setInternLink(6, sumComponents[0], 1);
+    setInternLink(7, sumComponents[0], 2);
+    setInternLink(9, splitter, 1);
+    setInternLink(10, sumComponents[0], 6);
+    setInternLink(11, sumComponents[1], 6);
+    setInternLink(12, sumComponents[2], 6);
+    setInternLink(13, sumComponents[3], 6);
+    setInternLink(14, highSpeedParCarry, 10);
+    // all internal links are set
+
+    splitter->setLink(2, highSpeedParCarry, 9);
+    splitter->setLink(3, sumComponents[0], 5);
+
+    // sumComponents[0] pin 1 is already used
+    // sumComponents[0] pin 2 is already used
+    sumComponents[0]->setLink(3, highSpeedParCarry, 7);
+    sumComponents[0]->setLink(4, highSpeedParCarry, 8);
+    // sumComponents[0] pin 5 is already used
+    // sumComponents[0] pin 6 is already used
+    sumComponents[0]->setLink(7, sumComponents[1], 5);
+
+    // sumComponents[1] pin 1 is already used
+    // sumComponents[1] pin 2 is already used
+    sumComponents[1]->setLink(3, highSpeedParCarry, 5);
+    sumComponents[1]->setLink(4, highSpeedParCarry, 6);
+    // sumComponents[1] pin 5 is already used
+    // sumComponents[1] pin 6 is already used
+    sumComponents[1]->setLink(7, sumComponents[2], 5);
+
+    // sumComponents[2] pin 1 is already used
+    // sumComponents[2] pin 2 is already used
+    sumComponents[2]->setLink(3, highSpeedParCarry, 3);
+    sumComponents[2]->setLink(4, highSpeedParCarry, 4);
+    // sumComponents[2] pin 5 is already used
+    // sumComponents[2] pin 6 is already used
+    sumComponents[2]->setLink(7, sumComponents[3], 5);
+
+    // sumComponents[3] pin 1 is already used
+    // sumComponents[3] pin 2 is already used
+    sumComponents[3]->setLink(3, highSpeedParCarry, 1);
+    sumComponents[3]->setLink(4, highSpeedParCarry, 2);
+    // sumComponents[3] pin 5 is already used
+    // sumComponents[3] pin 6 is already used
+    sumComponents[3]->setUnused(7);
+
+    // highSpeedParCarry all pins are already used
 }

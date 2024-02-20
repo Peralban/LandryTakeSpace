@@ -127,6 +127,7 @@ void nts::ParseFile::linkComponents(void)
             if (_components[i].second == _links[j].first.first) {
                 for (size_t k = 0; k < _components.size(); k++) {
                     if (_components[k].second == _links[j].second.first) {
+                        std::cout << _components[i].second << " " << _links[j].first.second << " " << _components[k].second << " " << _links[j].second.second << std::endl;
                         _components[i].first->setLink(std::stoi(_links[j].first.second), _components[k].first, std::stoi(_links[j].second.second));
                     }
                 }
@@ -145,14 +146,6 @@ std::unique_ptr<nts::IComponent> nts::ParseFile::createComponent(const std::stri
         return std::unique_ptr<nts::IComponent>(new nts::XorGate());
     else if (type == "not")
         return std::unique_ptr<nts::IComponent>(new nts::NotGate());
-    else if (type == "nand")
-        return std::unique_ptr<nts::IComponent>(new nts::NAndGate());
-    else if (type == "nor")
-        return std::unique_ptr<nts::IComponent>(new nts::NOrGate());
-    else if (type == "nxor")
-        return std::unique_ptr<nts::IComponent>(new nts::NXorGate());
-    else if (type == "splitter")
-        return std::unique_ptr<nts::IComponent>(new nts::Splitter());
     else if (type == "true")
         return std::unique_ptr<nts::IComponent>(new nts::TrueComponent());
     else if (type == "false")
@@ -175,5 +168,9 @@ std::unique_ptr<nts::IComponent> nts::ParseFile::createComponent(const std::stri
         return std::unique_ptr<nts::IComponent>(new nts::OutputComponent());
     else if (type == "clock")
         return std::unique_ptr<nts::IComponent>(new nts::ClockComponent());
+    else if (type == "4008")
+        return std::unique_ptr<nts::IComponent>(new nts::Component4008());
+    else if (type == "4013")
+        return std::unique_ptr<nts::IComponent>(new nts::Component4013());
     throw nts::Error("Component not found");
 }

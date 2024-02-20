@@ -76,9 +76,9 @@ void nts::SFMLModule::display()
             input.first.getRectangle().setFillColor(sf::Color(128, 128, 128, 255));
         input.second.first->resetInfinityCounter();
         _window.draw(input.first.getRectangle());
-        std::cout << "no1" << std::endl;
-        _window.draw(input.first.getText());
-        std::cout << "no2" << std::endl;
+        //std::cout << "no1" << std::endl;
+        //_window.draw(input.first.getText());
+        //std::cout << "no2" << std::endl;
     }
     for (auto &output : _outputGates) {
         nts::Tristate state = output.second.first->compute(1);
@@ -90,7 +90,7 @@ void nts::SFMLModule::display()
             output.first.getRectangle().setFillColor(sf::Color(128, 128, 128, 255));
         output.second.first->resetInfinityCounter();
         _window.draw(output.first.getRectangle());
-        _window.draw(output.first.getText());
+        //_window.draw(output.first.getText());
     }
     for (auto &gate : _otherGates) {
         nts::Tristate state = gate.second.first->compute(1);
@@ -102,7 +102,7 @@ void nts::SFMLModule::display()
             gate.first.getRectangle().setFillColor(sf::Color(128, 128, 128, 255));
         gate.second.first->resetInfinityCounter();
         _window.draw(gate.first.getRectangle());
-        _window.draw(gate.first.getText());
+        //_window.draw(gate.first.getText());
     }
     _window.display();
 }
@@ -116,7 +116,6 @@ nts::SFMLGates::SFMLGates(std::string name, Type type, sf::VideoMode _videoMode)
     static unsigned int stape = 0;
     if (!_font.loadFromFile("Fonts/Montserrat-Regular.ttf")) // "Fonts/Montserrat-Regular.ttf"
         throw std::runtime_error("Error: Font not found");
-    // if it's an input the gate has to be on the left side of the window
     if (type == INPUT) {
         if (stape == 0) {
             x = 0;
