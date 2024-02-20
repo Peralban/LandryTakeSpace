@@ -50,10 +50,10 @@ namespace nts {
         ~NOrGate() = default;
     };
 
-    class NXorGate : public AdvancedComponent {
+    class XNorGate : public AdvancedComponent {
     public:
-        NXorGate(std::size_t inputs = 2);
-        ~NXorGate() = default;
+        XNorGate(std::size_t inputs = 2);
+        ~XNorGate() = default;
     };
 
     class Splitter : public AComponent {
