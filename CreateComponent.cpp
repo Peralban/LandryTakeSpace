@@ -21,8 +21,8 @@ std::unique_ptr<nts::IComponent> nts::createComponent(const std::string &type)
         return std::unique_ptr<nts::IComponent>(new nts::NAndGate());
     else if (type == "nor")
         return std::unique_ptr<nts::IComponent>(new nts::NOrGate());
-    else if (type == "nxor")
-        return std::unique_ptr<nts::IComponent>(new nts::NXorGate());
+    else if (type == "xnor")
+        return std::unique_ptr<nts::IComponent>(new nts::XNorGate());
     else if (type == "splitter")
         return std::unique_ptr<nts::IComponent>(new nts::Splitter());
     else if (type == "true")

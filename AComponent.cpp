@@ -203,10 +203,11 @@ void nts::AComponent::clearStateSet(size_t pin)
         }
     }
     if (isOutput(pin)) {
+        _stateSet[pin] = 0;
         IComponent *linked = linkedTo(pin);
         if (linked == nullptr)
             return;
-        linkedTo(pin)->clearStateSet(getOtherPin(pin));
+        linked->clearStateSet(getOtherPin(pin));
     }
     if (isUnused(pin))
         throw nts::Error("Unused pin cannot be cleared");
