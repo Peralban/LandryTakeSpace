@@ -42,10 +42,10 @@ static void display(nts::allInputAndNameInVector Inputs, nts::allOutputAndNameIn
     std::cout << "tick: " << tick << std::endl;
     std::cout << "input(s):" << std::endl;
     for (auto &input : Inputs)
-        std::cout << input.second << ": " << getValue(input.first->compute(1)) << std::endl;
+        std::cout << "  " << input.second << ": " << getValue(input.first->compute(1)) << std::endl;
     std::cout << "output(s):" << std::endl;
     for (auto &output : Outputs)
-        std::cout << output.second << ": " << getValue(output.first->compute(1)) << std::endl;
+        std::cout << "  " << output.second << ": " << getValue(output.first->compute(1)) << std::endl;
 }
 
 static void simulate(nts::allInputAndNameInVector Inputs, nts::allOutputAndNameInVector Outputs, size_t &tick,
@@ -81,7 +81,7 @@ static void simulate(nts::allInputAndNameInVector Inputs, nts::allOutputAndNameI
 void nts::NanotekSpice::execShell()
 {
     std::string line;
-    std::cout << "❯ ";
+    std::cout << "> ";
     while (getline(std::cin, line)) {
         if (line.empty())
             continue;
@@ -90,11 +90,11 @@ void nts::NanotekSpice::execShell()
                 checkExistence(_inputs, line);
                 _saveValue.push_back(std::make_pair(line.substr(0, line.find("=")),
                                                     line.substr(line.find("=") + 1)));
-                std::cout << "❯ ";
+                std::cout << "> ";
                 continue;
             } catch (nts::Error &e) {
                 std::cerr << e.what() << std::endl;
-                std::cout << "❯ ";
+                std::cout << "> ";
                 continue;
             }
         } if (line == "display") {
@@ -102,6 +102,7 @@ void nts::NanotekSpice::execShell()
         } else if (line == "simulate") {
             try {
                 simulate(_inputs, _outputs, _tick, _saveValue);
+                resetAllInfinitCounter();
             } catch (nts::Error &e) {
                 std::cerr << e.what() << std::endl;
             }
@@ -110,6 +111,12 @@ void nts::NanotekSpice::execShell()
         } else {
             std::cerr << "Error: invalid command" << std::endl;
         }
-        std::cout << "❯ ";
+        std::cout << "> ";
     }
+}
+
+void nts::NanotekSpice::resetAllInfinitCounter()
+{
+    for (auto &component : _components)
+        component.first->resetInfinityCounter();
 }

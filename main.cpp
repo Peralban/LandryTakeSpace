@@ -39,7 +39,7 @@ int main(int ac, char **av)
         std::cerr << e.what() << std::endl;
         exit(84);
     }
-    nts::NanotekSpice nanotekSpice(parseFile.getInputsVector(), parseFile.getOutputsVector());
+    nts::NanotekSpice nanotekSpice(parseFile.getInputsVector(), parseFile.getOutputsVector(), parseFile.getComponents());
     nanotekSpice.execShell();
     return 0;
 }
