@@ -7,7 +7,10 @@
 
 #pragma once
 
-#include "CreateComponent.hpp"
+#include "BasicGates.hpp"
+#include "SpecialComponents.hpp"
+#include "GatesComponents.hpp"
+#include <memory>
 #include <fstream>
 #include <cstring>
 
@@ -41,7 +44,6 @@ namespace nts
 
     static std::vector<std::string> inputList = {
         "input",
-        "output",
         "clock",
         "true",
         "false",
@@ -68,7 +70,6 @@ namespace nts
     public:
         ParseFile(void) : _nbInput(0), _nbOutput(0) {}
         ~ParseFile() = default;
-        void error_case(int ac, char **av);
         std::vector<std::string> fileInVector(void);
         void linkComponents(void);
         void parseData(void);
@@ -80,11 +81,12 @@ namespace nts
         std::vector<std::string> getFileContent() { return _fileContent; }
         allInputAndNameInVector getInputsVector() { return _inputsVector; }
         allOutputAndNameInVector getOutputsVector() { return _outputsVector; }
-        void setCircuit();
-        IComponent *getCircuit() { return circuit; }
-        unsigned int getNbInput() { return _nbInput; }
-        unsigned int getNbOutput() { return _nbOutput; }
+        size_t getNbInput() { return _nbInput; }
+        size_t getNbOutput() { return _nbOutput; }
+        size_t getNbComponents() { return _components.size(); }
+        size_t getNbPin() { return (_nbInput + _nbOutput); }
 
+        static std::unique_ptr<nts::IComponent> createComponent(const std::string &type);
 
         void saveShipsetInVector(std::string line, std::vector<std::string> &names);
         void saveLinkInVector(std::string line, std::vector<std::string> &names);
@@ -102,9 +104,8 @@ namespace nts
         LinkInVector _links;
         allInputAndNameInVector _inputsVector;
         allOutputAndNameInVector _outputsVector;
-        unsigned int _nbInput;
-        unsigned int _nbOutput;
-        IComponent *circuit;
+        size_t _nbInput;
+        size_t _nbOutput;
     };
 
 }  // namespace nts
