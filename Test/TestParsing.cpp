@@ -225,6 +225,7 @@ Test(Parsing, Parsing11)
     }
     cr_assert_str_eq(ac.c_str(), ac2.c_str());
 }
+
 Test(Parsing, Parsing12)
 {
     nts::ParseFile parsing;
@@ -238,4 +239,18 @@ Test(Parsing, Parsing12)
         ac2 = e.what();
     }
     cr_assert_str_eq(ac.c_str(), ac2.c_str());
+}
+Test(Parsing, allcomp)
+{
+    nts::ParseFile parsing;
+    std::string ac2;
+    try {
+        parsing.setFileName("Test/Templates/all.nts");
+        parsing.fileInVector();
+        parsing.parseData();
+    } catch (nts::Error &e) {
+        ac2 = e.what();
+    }
+    int ac3 = parsing.getNbComponents();
+    cr_assert_eq(ac3, 19);
 }

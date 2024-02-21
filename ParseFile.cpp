@@ -145,14 +145,6 @@ std::unique_ptr<nts::IComponent> nts::ParseFile::createComponent(const std::stri
         return std::unique_ptr<nts::IComponent>(new nts::XorGate());
     else if (type == "not")
         return std::unique_ptr<nts::IComponent>(new nts::NotGate());
-    else if (type == "nand")
-        return std::unique_ptr<nts::IComponent>(new nts::NAndGate());
-    else if (type == "nor")
-        return std::unique_ptr<nts::IComponent>(new nts::NOrGate());
-    else if (type == "xnor")
-        return std::unique_ptr<nts::IComponent>(new nts::XNorGate());
-    else if (type == "splitter")
-        return std::unique_ptr<nts::IComponent>(new nts::Splitter());
     else if (type == "true")
         return std::unique_ptr<nts::IComponent>(new nts::TrueComponent());
     else if (type == "false")
@@ -175,5 +167,9 @@ std::unique_ptr<nts::IComponent> nts::ParseFile::createComponent(const std::stri
         return std::unique_ptr<nts::IComponent>(new nts::OutputComponent());
     else if (type == "clock")
         return std::unique_ptr<nts::IComponent>(new nts::ClockComponent());
+    else if (type == "4008")
+        return std::unique_ptr<nts::IComponent>(new nts::Component4008());
+    else if (type == "4013")
+        return std::unique_ptr<nts::IComponent>(new nts::Component4013());
     throw nts::Error("Component not found");
 }

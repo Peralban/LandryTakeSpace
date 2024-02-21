@@ -10,6 +10,7 @@
 #include "BasicGates.hpp"
 #include "SpecialComponents.hpp"
 #include "GatesComponents.hpp"
+#include "AdvancedComponents.hpp"
 #include <memory>
 #include <fstream>
 #include <cstring>
