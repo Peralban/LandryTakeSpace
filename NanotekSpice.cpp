@@ -51,7 +51,8 @@ static void display(nts::allInputAndNameInVector Inputs, nts::allOutputAndNameIn
     std::cout << "tick: " << tick << std::endl;
     std::cout << "input(s):" << std::endl;
     for (auto &input : Inputs)
-        std::cout << "  " << input.second << ": " << getValue(input.first->compute(1)) << std::endl;
+        if (!input.first->isUnused(2))
+            std::cout << "  " << input.second << ": " << getValue(input.first->compute(1)) << std::endl;
     std::cout << "output(s):" << std::endl;
     for (auto &output : Outputs)
         std::cout << "  " << output.second << ": " << getValue(output.first->compute(1)) << std::endl;
