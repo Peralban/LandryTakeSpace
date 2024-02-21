@@ -6,6 +6,15 @@
 */
 
 #include "NanotekSpice.hpp"
+#include <csignal>
+
+volatile sig_atomic_t flag = 1;
+
+static void handleSigint(int sig)
+{
+    (void)sig;
+    flag = 0;
+}
 
 static void checkExistence(nts::allInputAndNameInVector Inputs, std::string src)
 {
@@ -103,6 +112,18 @@ void nts::NanotekSpice::execShell()
             try {
                 simulate(_inputs, _outputs, _tick, _saveValue);
                 resetAllInfinitCounter();
+            } catch (nts::Error &e) {
+                std::cerr << e.what() << std::endl;
+            }
+        } else if (line == "loop") {
+            try {
+                while (flag) {
+                    signal(SIGINT, handleSigint);
+                    simulate(_inputs, _outputs, _tick, _saveValue);
+                    display(_inputs, _outputs, _tick);
+                    resetAllInfinitCounter();
+                }
+                signal(SIGINT, SIG_DFL);
             } catch (nts::Error &e) {
                 std::cerr << e.what() << std::endl;
             }
