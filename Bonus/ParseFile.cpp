@@ -122,18 +122,12 @@ void nts::ParseFile::parseData(void) {
 
 void nts::ParseFile::linkComponents(void)
 {
-    for (size_t i = 0; i < _components.size(); i++) {
-        for (size_t j = 0; j < _links.size(); j++) {
-            if (_components[i].second == _links[j].first.first) {
-                for (size_t k = 0; k < _components.size(); k++) {
-                    if (_components[k].second == _links[j].second.first) {
-                        std::cout << _components[i].second << " " << _links[j].first.second << " " << _components[k].second << " " << _links[j].second.second << std::endl;
+    for (size_t i = 0; i < _components.size(); i++)
+        for (size_t j = 0; j < _links.size(); j++)
+            if (_components[i].second == _links[j].first.first)
+                for (size_t k = 0; k < _components.size(); k++)
+                    if (_components[k].second == _links[j].second.first)
                         _components[i].first->setLink(std::stoi(_links[j].first.second), _components[k].first, std::stoi(_links[j].second.second));
-                    }
-                }
-            }
-        }
-    }
 }
 
 std::unique_ptr<nts::IComponent> nts::ParseFile::createComponent(const std::string &type)

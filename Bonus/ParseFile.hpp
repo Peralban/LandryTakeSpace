@@ -77,7 +77,7 @@ namespace nts
 
         void setFileName(std::string fileName) { _fileName = fileName; }
 
-        componentAndNameInVector getComponents() { return _components; }
+        componentAndNameInVector &getComponents() { return _components; }
         LinkInVector getLinks() { return _links; }
         std::vector<std::string> getFileContent() { return _fileContent; }
         allInputAndNameInVector getInputsVector() { return _inputsVector; }

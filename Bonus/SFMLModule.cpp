@@ -130,7 +130,7 @@ nts::SFMLGates::SFMLGates(std::string name, Type type, sf::VideoMode _videoMode)
         }
     } else if (type == GATE) {
         if (stape == 1) {
-            x += 200;
+            x += 400;
             y = 0;
             stape = 2;
         } else {
@@ -142,7 +142,7 @@ nts::SFMLGates::SFMLGates(std::string name, Type type, sf::VideoMode _videoMode)
         }
     } else if (type == OUTPUT) {
         if (stape == 2) {
-            x += 200;
+            x += 400;
             y = 0;
             stape = 3;
         } else {
