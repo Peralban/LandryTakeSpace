@@ -243,6 +243,7 @@ Test(Parsing, Parsing12)
 Test(Parsing, allcomp)
 {
     nts::ParseFile parsing;
+    std::string ac2;
     try {
         parsing.setFileName("Test/Templates/all.nts");
         parsing.fileInVector();
