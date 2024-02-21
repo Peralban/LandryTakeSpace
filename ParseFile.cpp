@@ -32,14 +32,20 @@ void nts::ParseFile::checkName(std::vector<std::string> type, std::string name)
 
 void nts::ParseFile::saveLinkInVector(std::string line, std::vector<std::string> &names)
 {
+    while (line[0] == ' ' || line[0] == '\t')
+        line = line.substr(1);
     std::string firstName = line.substr(0, line.find(":"));
     checkName(names, firstName);
     line = line.substr(line.find(":") + 1);
     std::string firstPin = line.substr(0, line.find(" "));
-    line = line.substr(line.find(" ") + 1);
+    int n = line.find(" ") > line.find("\t") ? line.find("\t") : line.find(" ");
+    line = line.substr(n);
+    while (line[0] == ' ' || line[0] == '\t')
+        line = line.substr(1);
     std::string secondName = line.substr(0, line.find(":"));
     checkName(names, secondName);
-    line = line.substr(line.find(":") + 1, line.find(" "));
+    n = line.find(":") > line.find("\t") ? line.find("\t") : line.find(":");
+    line = line.substr(line.find(":") + 1, n);
     std::string secondPin = line;
     _links.push_back(std::make_pair(std::make_pair(firstName, firstPin), std::make_pair(secondName, secondPin)));
 }
@@ -55,10 +61,16 @@ static bool isInput(std::string name)
 
 void nts::ParseFile::saveShipsetInVector(std::string line, std::vector<std::string> &names)
 {
-    std::string componentName = line.substr(0, line.find(" "));
-    line = line.substr(line.find(" ") + 1);
+    while (line[0] == ' ' || line[0] == '\t')
+        line = line.substr(1);
+    int n = line.find(" ") > line.find("\t") ? line.find("\t") : line.find(" ");
+    std::string componentName = line.substr(0, n);
+    line = line.substr(n);
+    while (line[0] == ' ' || line[0] == '\t')
+        line = line.substr(1);
     checkName(nts::type, componentName);
-    std::string name = line.substr(0, line.find(" "));
+    n = line.find(" ") > line.find("\t") ? line.find("\t") : line.find(" ");
+    std::string name = line.substr(0, n);
     names.pop_back();
     names.push_back(name);
     names.push_back("end");
@@ -91,9 +103,9 @@ static void checkLine(std::string line, nts::ParseState state)
     std::regex reg;
 
     if (state == nts::ParseState::CHIPSETS) {
-        reg = std::regex("^[\\w]+ [\\w]+( #.*)?$");
+        reg = std::regex("^([ \\t]+)?([a-zA-Z0-9]+)\\s+(\\w+)(\\s+)?(#.*)?$", std::regex_constants::ECMAScript | std::regex_constants::multiline);
     } else if (state == nts::ParseState::LINKS) {
-        reg = std::regex("^[\\w]+:[\\d]+ [\\w]+:[\\d]+( #.*)?$");
+        reg = std::regex("^([ \\t]+)?([a-zA-Z0-9_]+)((\\s+)?:(\\s+)?)([0-9]+)\\s+([a-zA-Z0-9_]+)((\\s+)?:(\\s+)?)([0-9]+)([ \\t]+)?(#.*)?", std::regex_constants::ECMAScript | std::regex_constants::multiline);
     }
     if (!std::regex_match(line, reg)) {
         throw nts::Error("Invalid line");
