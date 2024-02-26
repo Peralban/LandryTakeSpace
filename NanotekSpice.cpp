@@ -6,6 +6,15 @@
 */
 
 #include "NanotekSpice.hpp"
+#include <csignal>
+
+volatile sig_atomic_t flag = 1;
+
+static void handleSigint(int sig)
+{
+    (void)sig;
+    flag = 0;
+}
 
 static void checkExistence(nts::allInputAndNameInVector Inputs, std::string src)
 {
@@ -42,7 +51,8 @@ static void display(nts::allInputAndNameInVector Inputs, nts::allOutputAndNameIn
     std::cout << "tick: " << tick << std::endl;
     std::cout << "input(s):" << std::endl;
     for (auto &input : Inputs)
-        std::cout << "  " << input.second << ": " << getValue(input.first->compute(1)) << std::endl;
+        if (!input.first->isUnused(2))
+            std::cout << "  " << input.second << ": " << getValue(input.first->compute(1)) << std::endl;
     std::cout << "output(s):" << std::endl;
     for (auto &output : Outputs)
         std::cout << "  " << output.second << ": " << getValue(output.first->compute(1)) << std::endl;
@@ -78,10 +88,23 @@ static void simulate(nts::allInputAndNameInVector Inputs, nts::allOutputAndNameI
     saveValue.clear();
 }
 
+static void sortComponentsByNames(nts::allInputAndNameInVector &Inputs, nts::allOutputAndNameInVector &Outputs)
+{
+    std::sort(Inputs.begin(), Inputs.end(), [](const std::pair<nts::IComponent *, std::string> &a,
+                                               const std::pair<nts::IComponent *, std::string> &b) {
+        return a.second < b.second;
+    });
+    std::sort(Outputs.begin(), Outputs.end(), [](const std::pair<nts::IComponent *, std::string> &a,
+                                                 const std::pair<nts::IComponent *, std::string> &b) {
+        return a.second < b.second;
+    });
+}
+
 void nts::NanotekSpice::execShell()
 {
     std::string line;
     std::cout << "> ";
+    sortComponentsByNames(_inputs, _outputs);
     while (getline(std::cin, line)) {
         if (line.empty())
             continue;
@@ -103,6 +126,18 @@ void nts::NanotekSpice::execShell()
             try {
                 simulate(_inputs, _outputs, _tick, _saveValue);
                 resetAllInfinitCounter();
+            } catch (nts::Error &e) {
+                std::cerr << e.what() << std::endl;
+            }
+        } else if (line == "loop") {
+            try {
+                while (flag) {
+                    signal(SIGINT, handleSigint);
+                    simulate(_inputs, _outputs, _tick, _saveValue);
+                    display(_inputs, _outputs, _tick);
+                    resetAllInfinitCounter();
+                }
+                signal(SIGINT, SIG_DFL);
             } catch (nts::Error &e) {
                 std::cerr << e.what() << std::endl;
             }

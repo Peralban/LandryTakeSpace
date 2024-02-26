@@ -134,7 +134,6 @@ nts::Tristate nts::XorGate::compute(std::size_t pin)
         }
         _stateSet[pin] = 1;
         _state[pin] = nbTrue % 2 ? nts::Tristate::True : nts::Tristate::False;
-        std::cout << "XOR GATE: " << _state[pin] << std::endl;
         return nbTrue % 2 ? nts::Tristate::True : nts::Tristate::False;
     }
     if (isInput(pin))
