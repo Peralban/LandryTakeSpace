@@ -106,8 +106,10 @@ void nts::NanotekSpice::execShell()
     std::cout << "> ";
     sortComponentsByNames(_inputs, _outputs);
     while (getline(std::cin, line)) {
-        if (line.empty())
+        if (line.empty()) {
+            std::cout << "> ";
             continue;
+        }
         if (line.find("=") != std::string::npos) {
             try {
                 checkExistence(_inputs, line);
