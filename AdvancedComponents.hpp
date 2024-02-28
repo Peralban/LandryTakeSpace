@@ -44,4 +44,31 @@ namespace nts {
         Component4008();
         ~Component4008() = default;
     };
+
+    // 5-STAGE Johnson counter hard defined
+    class JohnsonCounterHard : public AComponent {
+    public:
+        JohnsonCounterHard();
+        ~JohnsonCounterHard() = default;
+        nts::Tristate compute(std::size_t pin) override;
+        void clearStateSet(size_t pin) override;
+    private:
+        int _data;
+    };
+
+    //Decoding Johnson counter
+    class JohnsonDecoder : public AdvancedComponent {
+    public:
+        JohnsonDecoder();
+        ~JohnsonDecoder() = default;
+        //void clearStateSet(size_t pin) override;
+    };
+
+    // 4017 component: 10 bits Johnson decade
+    class Component4017 : public AdvancedComponent {
+    public:
+        Component4017();
+        ~Component4017() = default;
+        void clearStateSet(size_t pin) override;
+    };
 }

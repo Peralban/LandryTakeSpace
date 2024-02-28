@@ -7,6 +7,7 @@
 
 #include "AdvancedComponents.hpp"
 #include "BasicGates.hpp"
+#include "SpecialComponents.hpp"
 
 /*-----------------D FLIP FLOP-----------------*/
 
@@ -35,9 +36,9 @@ nts::DFlipFlop::DFlipFlop() : AdvancedComponent(6)
     // RESET
     setInternLink(4, splitter[3], 1);
     // Q
-    setInternLink(5, splitter[8], 2);
+    setInternLink(5, splitter[9], 2);
     // Q_NOT
-    setInternLink(6, splitter[9], 2);
+    setInternLink(6, splitter[8], 2);
     // all internal links are set
 
     for (std::size_t i = 0; i < 6; i++)
@@ -350,4 +351,213 @@ nts::Component4008::Component4008() : AdvancedComponent(16)
     sumComponents[3]->setUnused(7);
 
     // highSpeedParCarry all pins are already used
+}
+
+/*---------------Johnson Counter---------------*/
+
+nts::JohnsonCounterHard::JohnsonCounterHard() : AComponent(7)
+{
+    for (std::size_t i = 1; i <= 5; i++)
+        setOutput(i);
+    for (std::size_t i = 6; i <= 7; i++)
+        setInput(i);
+    _data = 0;
+}
+
+nts::Tristate nts::JohnsonCounterHard::compute(std::size_t pin)
+{
+    int outputData = 0b000001111100000;
+    if (isInput(pin)) {
+        return getLink(pin);
+    }
+    if (isOutput(pin)) {
+        nts::Tristate buff = getLink(6);
+        if (buff == nts::Tristate::True && _stateSet[6] == 0 && getLink(7) == nts::False) {
+            _data++;
+            _stateSet[6] = 1;
+            _state[6] = buff;
+            if (_data == 10)
+                _data = 0;
+        }
+        buff = getLink(7);
+        if (buff == nts::Tristate::True) {
+            _data = 0;
+            _stateSet[7] = 1;
+            _state[7] = buff;
+            for (int i = 1; i <= 5; i++) {
+                _state[i] = 0;
+                _stateSet[i] = 1;
+            }
+        }
+        if (buff == nts::Tristate::False) {
+            _stateSet[7] = 1;
+            _state[7] = buff;
+            for (int i = 1; i <= 5; i++) {
+                _state[i] = (outputData >> (_data + 5 - i)) & 1;
+                _stateSet[i] = 1;
+            }
+        }
+        if (buff == nts::Undefined) {
+            for (int i = 1; i <= 5; i++) {
+                _state[i] = nts::Tristate::Undefined;
+                _stateSet[i] = 1;
+            }
+        }
+        return (nts::Tristate)_state[pin];
+    }
+    throw nts::Error("Pin index out of range");
+}
+
+void nts::JohnsonCounterHard::clearStateSet(std::size_t pin)
+{
+    if (isInput(pin)) {
+        _stateSet[6] = 0;
+        _stateSet[7] = 0;
+        for (std::size_t i = 1; i <= 5; i++) {
+            clearStateSet(i);
+            compute(i);
+        }
+    }
+    if (isOutput(pin)) {
+        _stateSet[pin] = 0;
+        IComponent *linked = linkedTo(pin);
+        if (linked == nullptr)
+            return;
+        linked->clearStateSet(getOtherPin(pin));
+    }
+}
+
+/*-----------------Jhonson Decoder-----------------*/
+
+nts::JohnsonDecoder::JohnsonDecoder() : AdvancedComponent(16)
+{
+    for (std::size_t i = 1; i <= 5; i++)
+        setInput(i);
+    for (std::size_t i = 6; i <= 16; i++)
+        setOutput(i);
+
+    std::vector<IComponent *> inSplitter(5);
+    std::vector<IComponent *> inNotGates(5);
+    for (std::size_t i = 0; i < 5; i++) {
+        inSplitter[i] = new Splitter(2);
+        inNotGates[i] = new NotGate();
+        inSplitter[i]->setLink(3, inNotGates[i], 1);
+        setInternLink(i + 1, inSplitter[i], 1);
+    }
+
+    std::vector<IComponent *> splitter(9);
+    for (std::size_t i = 0; i < 9; i++)
+        splitter[i] = new Splitter(2);
+    splitter[0]->setLink(1, inSplitter[4], 2);
+    splitter[1]->setLink(1, inNotGates[0], 2);
+    splitter[2]->setLink(1, inSplitter[0], 2);
+    splitter[3]->setLink(1, inNotGates[1], 2);
+    splitter[4]->setLink(1, inSplitter[1], 2);
+    splitter[5]->setLink(1, inNotGates[2], 2);
+    splitter[6]->setLink(1, inSplitter[2], 2);
+    splitter[7]->setLink(1, inNotGates[3], 2);
+    splitter[8]->setLink(1, inSplitter[3], 2);
+    IComponent *carrySplitter = new Splitter(3);
+    carrySplitter->setLink(1, inNotGates[4], 2);
+
+    std::vector<IComponent *> norGates(10);
+    for (std::size_t i = 0; i < 10; i++) {
+        norGates[i] = new NOrGate(2);
+        setInternLink(i + 6, norGates[i], 3);
+    }
+
+    norGates[0]->setLink(1, splitter[0], 2);
+    norGates[0]->setLink(2, splitter[2], 2);
+
+    norGates[1]->setLink(1, splitter[4], 2);
+    norGates[1]->setLink(2, splitter[1], 2);
+
+    norGates[2]->setLink(1, splitter[3], 2);
+    norGates[2]->setLink(2, splitter[6], 2);
+
+    norGates[3]->setLink(1, splitter[8], 2);
+    norGates[3]->setLink(2, splitter[5], 2);
+
+    norGates[4]->setLink(1, splitter[0], 3);
+    norGates[4]->setLink(2, splitter[7], 2);
+
+    norGates[5]->setLink(1, splitter[1], 3);
+    norGates[5]->setLink(2, carrySplitter, 2);
+
+    norGates[6]->setLink(1, splitter[2], 3);
+    norGates[6]->setLink(2, splitter[3], 3);
+
+    norGates[7]->setLink(1, splitter[4], 3);
+    norGates[7]->setLink(2, splitter[5], 3);
+
+    norGates[8]->setLink(1, splitter[7], 3);
+    norGates[8]->setLink(2, splitter[6], 3);
+
+    norGates[9]->setLink(1, splitter[8], 3);
+    norGates[9]->setLink(2, carrySplitter, 3);
+
+    setInternLink(16, carrySplitter, 4);
+}
+
+/*-----------------4017-----------------*/
+
+#define JDPIN(n) (n + 6)
+
+nts::Component4017::Component4017() : AdvancedComponent(16)
+{
+    for (std::size_t i = 1; i <= 12; i++)
+        setOutput(i);
+    for (std::size_t i = 13; i <= 16; i++)
+        setInput(i);
+    setUnused(8);
+    setUnused(16);
+
+    IComponent *notClock = new NotGate();
+    IComponent *andClock = new AndGate(2);
+
+    setInternLink(14, andClock, 1); // CP0: Clock -> x
+    setInternLink(13, notClock, 1); // CP1: EN/ -> x
+    notClock->setLink(2, andClock, 2);
+
+    IComponent *jhonsonCounter = new JohnsonCounterHard();
+
+    andClock->setLink(3, jhonsonCounter, 6); // x -> CP
+    setInternLink(15, jhonsonCounter, 7); //MR -> MR
+
+    IComponent *jhonsonDecoder = new JohnsonDecoder();
+
+    for (std::size_t i = 1; i <= 5; i++) {
+        jhonsonCounter->setLink(i, jhonsonDecoder, i);
+    }
+    setInternLink(1, jhonsonDecoder, JDPIN(5));
+    setInternLink(2, jhonsonDecoder, JDPIN(1));
+    setInternLink(3, jhonsonDecoder, JDPIN(0));
+    setInternLink(4, jhonsonDecoder, JDPIN(2));
+    setInternLink(5, jhonsonDecoder, JDPIN(6));
+    setInternLink(6, jhonsonDecoder, JDPIN(7));
+    setInternLink(7, jhonsonDecoder, JDPIN(3));
+    //pin 8 is unused
+    setInternLink(9, jhonsonDecoder, JDPIN(8));
+    setInternLink(10, jhonsonDecoder, JDPIN(4));
+    setInternLink(11, jhonsonDecoder, JDPIN(9));
+    setInternLink(12, jhonsonDecoder, JDPIN(10));
+}
+
+void nts::Component4017::clearStateSet(std::size_t pin)
+{
+    if (isInput(pin)) {
+        if (internLinkedTo(pin) != nullptr)
+            internLinkedTo(pin)->clearStateSet(getOtherInternPin(pin));
+        for (std::size_t i = 1; i <= getNbPins(); i++) {
+            if (isOutput(i))
+                clearStateSet(i);
+        }
+    }
+    if (isOutput(pin)) {
+        _stateSet[pin] = 0;
+        IComponent *linked = linkedTo(pin);
+        if (linked == nullptr)
+            return;
+        linked->clearStateSet(getOtherPin(pin));
+    }
 }

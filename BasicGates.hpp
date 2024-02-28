@@ -36,6 +36,7 @@ namespace nts {
         NotGate();
         ~NotGate() = default;
         nts::Tristate compute(std::size_t pin) override;
+        void clearStateSet(size_t pin) override;
     };
 
     class NAndGate : public AdvancedComponent {
@@ -61,6 +62,7 @@ namespace nts {
         Splitter(std::size_t outputs = 2);
         ~Splitter() = default;
         nts::Tristate compute(std::size_t pin) override;
+        void clearStateSet(size_t pin) override;
     };
 
 }

@@ -34,8 +34,9 @@ nts::Tristate nts::SpecialComponent::compute(std::size_t pin)
             _state[1] = _state[1] == nts::Tristate::True ? nts::Tristate::False : nts::Tristate::True;
         }
         IComponent *linked = linkedTo(1);
-        if (linked != nullptr)
+        if (linked != nullptr) {
             linked->clearStateSet(getOtherPin(1));
+        }
         return (nts::Tristate)_state[1];
     }
     throw nts::Error("Pin index out of range");

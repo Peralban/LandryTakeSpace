@@ -167,6 +167,21 @@ nts::Tristate nts::NotGate::compute(std::size_t pin)
     throw nts::Error("Pin index out of range");
 }
 
+void nts::NotGate::clearStateSet(size_t pin)
+{
+    if (isInput(pin)) {
+        _stateSet[pin] = 0;
+        clearStateSet(2);
+    }
+    if (isOutput(pin)) {
+        _stateSet[pin] = 0;
+        IComponent *linked = linkedTo(pin);
+        if (linked == nullptr)
+            return;
+        linked->clearStateSet(getOtherPin(pin));
+    }
+}
+
 /*-----------------NAND GATE-----------------*/
 
 nts::NAndGate::NAndGate(std::size_t inputs) : nts::AdvancedComponent(inputs + 1)
@@ -224,10 +239,29 @@ nts::Splitter::Splitter(std::size_t outputs) : nts::AComponent(outputs + 1)
 nts::Tristate nts::Splitter::compute(std::size_t pin)
 {
     checkInfinityCounter();
-    if (isOutput(pin) || isInput(pin)) {
+    if (isInput(pin))
+        return getLink(1);
+    if (isOutput(pin)) {
         _stateSet[pin] = 1;
         _state[pin] = getLink(1);
         return (nts::Tristate)_state[pin];
     }
     throw nts::Error("Pin index out of range");
+}
+
+void nts::Splitter::clearStateSet(size_t pin)
+{
+    if (isInput(pin)) {
+        _stateSet[pin] = 0;
+        for (std::size_t i = 2; i <= _nbPins; i++) {
+            clearStateSet(i);
+        }
+    }
+    if (isOutput(pin)) {
+        _stateSet[pin] = 0;
+        IComponent *linked = linkedTo(pin);
+        if (linked == nullptr)
+            return;
+        linked->clearStateSet(getOtherPin(pin));
+    }
 }
