@@ -88,10 +88,23 @@ static void simulate(nts::allInputAndNameInVector Inputs, nts::allOutputAndNameI
     saveValue.clear();
 }
 
+static void sortComponentsByNames(nts::allInputAndNameInVector &Inputs, nts::allOutputAndNameInVector &Outputs)
+{
+    std::sort(Inputs.begin(), Inputs.end(), [](const std::pair<nts::IComponent *, std::string> &a,
+                                               const std::pair<nts::IComponent *, std::string> &b) {
+        return a.second < b.second;
+    });
+    std::sort(Outputs.begin(), Outputs.end(), [](const std::pair<nts::IComponent *, std::string> &a,
+                                                 const std::pair<nts::IComponent *, std::string> &b) {
+        return a.second < b.second;
+    });
+}
+
 void nts::NanotekSpice::execShell()
 {
     std::string line;
     std::cout << "> ";
+    sortComponentsByNames(_inputs, _outputs);
     while (getline(std::cin, line)) {
         if (line.empty())
             continue;
