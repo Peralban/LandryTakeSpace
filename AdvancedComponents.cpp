@@ -398,6 +398,7 @@ nts::Tristate nts::JohnsonCounterHard::compute(std::size_t pin)
             }
         }
         if (buff == nts::Undefined) {
+            _data = -1;
             for (int i = 1; i <= 5; i++) {
                 _state[i] = nts::Tristate::Undefined;
                 _stateSet[i] = 1;
@@ -543,14 +544,69 @@ nts::Component4017::Component4017() : AdvancedComponent(16)
     setInternLink(12, jhonsonDecoder, JDPIN(10));
 }
 
-void nts::Component4017::clearStateSet(std::size_t pin)
+/*-----------------12 BITS COUNTER-----------------*/
+
+nts::TwelveBitsCounter::TwelveBitsCounter() : AComponent(14)
+{
+    for (std::size_t i = 1; i <= 14; i++)
+        setOutput(i);
+    setInput(13);
+    setInput(14);
+    _data = 0;
+}
+
+nts::Tristate nts::TwelveBitsCounter::compute(std::size_t pin)
 {
     if (isInput(pin)) {
-        if (internLinkedTo(pin) != nullptr)
-            internLinkedTo(pin)->clearStateSet(getOtherInternPin(pin));
-        for (std::size_t i = 1; i <= getNbPins(); i++) {
-            if (isOutput(i))
-                clearStateSet(i);
+        return getLink(pin);
+    }
+    if (isOutput(pin)) {
+        nts::Tristate buff = getLink(13);
+        if (buff == nts::Tristate::True && _stateSet[13] == 0 && getLink(14) == nts::False) {
+            _data++;
+            _stateSet[13] = 1;
+            _state[13] = buff;
+            if (_data == 4096)
+                _data = 0;
+        }
+        buff = getLink(14);
+        if (buff == nts::Tristate::True) {
+            _data = 0;
+            _stateSet[14] = 1;
+            _state[14] = buff;
+            for (int i = 1; i <= 12; i++) {
+                _state[i] = 0;
+                _stateSet[i] = 1;
+            }
+        }
+        if (buff == nts::Tristate::False) {
+            _stateSet[14] = 1;
+            _state[14] = buff;
+            for (int i = 1; i <= 12; i++) {
+                _state[i] = (_data >> (i - 1)) & 1;
+                _stateSet[i] = 1;
+            }
+        }
+        if (buff == nts::Undefined) {
+            _data = -1;
+            for (int i = 1; i <= 12; i++) {
+                _state[i] = nts::Tristate::Undefined;
+                _stateSet[i] = 1;
+            }
+        }
+        return (nts::Tristate)_state[pin];
+    }
+    throw nts::Error("Pin index out of range");
+}
+
+void nts::TwelveBitsCounter::clearStateSet(std::size_t pin)
+{
+    if (isInput(pin)) {
+        _stateSet[13] = 0;
+        _stateSet[14] = 0;
+        for (std::size_t i = 1; i <= 12; i++) {
+            clearStateSet(i);
+            compute(i);
         }
     }
     if (isOutput(pin)) {
@@ -560,4 +616,35 @@ void nts::Component4017::clearStateSet(std::size_t pin)
             return;
         linked->clearStateSet(getOtherPin(pin));
     }
+}
+
+/*-----------------4040-----------------*/
+
+nts::Component4040::Component4040() : AdvancedComponent(16)
+{
+    for (std::size_t i = 1; i <= 16; i++)
+        setOutput(i);
+    setInput(10);
+    setInput(11);
+    setUnused(8);
+    setUnused(16);
+
+    IComponent *twelveBitsCounter = new TwelveBitsCounter();
+
+    setInternLink(1, twelveBitsCounter, 12);
+    setInternLink(2, twelveBitsCounter, 6);
+    setInternLink(3, twelveBitsCounter, 5);
+    setInternLink(4, twelveBitsCounter, 7);
+    setInternLink(5, twelveBitsCounter, 4);
+    setInternLink(6, twelveBitsCounter, 3);
+    setInternLink(7, twelveBitsCounter, 2);
+    //pin 8 is unused
+    setInternLink(9, twelveBitsCounter, 1);
+    setInternLink(10, twelveBitsCounter, 13);
+    setInternLink(11, twelveBitsCounter, 14);
+    setInternLink(12, twelveBitsCounter, 9);
+    setInternLink(13, twelveBitsCounter, 8);
+    setInternLink(14, twelveBitsCounter, 10);
+    setInternLink(15, twelveBitsCounter, 11);
+    //pin 16 is unused
 }
