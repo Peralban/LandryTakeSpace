@@ -69,6 +69,7 @@ void nts::SFMLModule::createInputGates(allInputAndNameInVector inputs, Type type
         index++;
     }
 }
+
 void nts::SFMLModule::displayAll()
 {
     _window.clear(sf::Color::White);
@@ -82,6 +83,7 @@ void nts::SFMLModule::displayAll()
             input.first.getRectangle().setFillColor(sf::Color(128, 128, 128, 255));
         input.second.first->resetInfinityCounter();
         _window.draw(input.first.getRectangle());
+        /////////////////////////////////////////////////////////////////////// draw text
         std::string name = input.first.getText().getString().toAnsiString();
         sf::Font font;
         if (!font.loadFromFile("Fonts/Montserrat-Regular.ttf"))
@@ -89,10 +91,51 @@ void nts::SFMLModule::displayAll()
         sf::Text text;
         text.setFont(font);
         text.setString(name);
-        text.setFillColor(sf::Color::Red);
-        text.setPosition(input.first.getRectangle().getPosition().x + 25, input.first.getRectangle().getPosition().y + 25);
+        text.setFillColor(sf::Color::Black);
+        text.setCharacterSize(input.first.getRectangle().getSize().x / 2);
+        text.setPosition(input.first.getRectangle().getPosition().x + input.first.getRectangle().getSize().x / 2 - text.getGlobalBounds().width / 2,
+                         input.first.getRectangle().getPosition().y + input.first.getRectangle().getSize().y / 2 - text.getGlobalBounds().height / 2);
+        /////////////////////////////////////////////////////////////////////// draw link
+        bool isLinked = false;
+        for (size_t i = 1; i < input.second.first->getNbPins(); i++) {
+            isLinked = false;
+            nts::IComponent *linked = input.second.first->linkedTo(i);
+            for (auto &output : _outputGates) {
+                if (linked == output.second.first) {
+                    isLinked = true;
+                    sf::Vertex line[] = {
+                        sf::Vertex(sf::Vector2f(input.first.getRectangle().getPosition().x + input.first.getRectangle().getSize().x,
+                                                 input.first.getRectangle().getPosition().y + input.first.getRectangle().getSize().y / 2)),
+                        sf::Vertex(sf::Vector2f(output.first.getRectangle().getPosition().x,
+                                                 output.first.getRectangle().getPosition().y + output.first.getRectangle().getSize().y / 2))
+                    };
+                    line[0].color = sf::Color::Black;
+                    line[1].color = sf::Color::Black;
+                    _window.draw(line, 2, sf::Lines, sf::RenderStates::Default);
+                    break;
+                }
+            }
+            if (isLinked)
+                continue;
+            for (auto &gate : _otherGates) {
+                if (linked == gate.second.first) {
+                    isLinked = true;
+                    sf::Vertex line[] = {
+                        sf::Vertex(sf::Vector2f(input.first.getRectangle().getPosition().x + input.first.getRectangle().getSize().x,
+                                                 input.first.getRectangle().getPosition().y + input.first.getRectangle().getSize().y / 2)),
+                        sf::Vertex(sf::Vector2f(gate.first.getRectangle().getPosition().x,
+                                                 gate.first.getRectangle().getPosition().y + gate.first.getRectangle().getSize().y / 2))
+                    };
+                    line[0].color = sf::Color::Black;
+                    line[1].color = sf::Color::Black;
+                    _window.draw(line, 2, sf::Lines, sf::RenderStates::Default);
+                    break;
+                }
+            }
+            if (isLinked)
+                continue;
+        }
         _window.draw(text);
-        std::cout << "no2" << std::endl;
     }
     for (auto &output : _outputGates) {
         nts::Tristate state = output.second.first->compute(1);
@@ -104,7 +147,59 @@ void nts::SFMLModule::displayAll()
             output.first.getRectangle().setFillColor(sf::Color(128, 128, 128, 255));
         output.second.first->resetInfinityCounter();
         _window.draw(output.first.getRectangle());
-        //_window.draw(output.first.getText());
+        /////////////////////////////////////////////////////////////////////// draw text
+        std::string name = output.first.getText().getString().toAnsiString();
+        sf::Font font;
+        if (!font.loadFromFile("Fonts/Montserrat-Regular.ttf"))
+            throw std::runtime_error("Error: Font not found");
+        sf::Text text;
+        text.setFont(font);
+        text.setString(name);
+        text.setFillColor(sf::Color::Black);
+        text.setCharacterSize(output.first.getRectangle().getSize().x / 2);
+        text.setPosition(output.first.getRectangle().getPosition().x + output.first.getRectangle().getSize().x / 2 - text.getGlobalBounds().width / 2,
+                         output.first.getRectangle().getPosition().y + output.first.getRectangle().getSize().y / 2 - text.getGlobalBounds().height / 2);
+        _window.draw(text);
+        /////////////////////////////////////////////////////////////////////// draw link
+        bool isLinked = false;
+        for (size_t i = 1; i < output.second.first->getNbPins(); i++) {
+            isLinked = false;
+            nts::IComponent *linked = output.second.first->linkedTo(i);
+            for (auto &input : _inputGates) {
+                if (linked == input.second.first) {
+                    isLinked = true;
+                    sf::Vertex line[] = {
+                        sf::Vertex(sf::Vector2f(output.first.getRectangle().getPosition().x,
+                                                 output.first.getRectangle().getPosition().y + output.first.getRectangle().getSize().y / 2)),
+                        sf::Vertex(sf::Vector2f(input.first.getRectangle().getPosition().x + input.first.getRectangle().getSize().x,
+                                                 input.first.getRectangle().getPosition().y + input.first.getRectangle().getSize().y / 2))
+                    };
+                    line[0].color = sf::Color::Black;
+                    line[1].color = sf::Color::Black;
+                    _window.draw(line, 2, sf::Lines, sf::RenderStates::Default);
+                    break;
+                }
+            }
+            if (isLinked)
+                continue;
+            for (auto &gate : _otherGates) {
+                if (linked == gate.second.first) {
+                    isLinked = true;
+                    sf::Vertex line[] = {
+                        sf::Vertex(sf::Vector2f(output.first.getRectangle().getPosition().x,
+                                                 output.first.getRectangle().getPosition().y + output.first.getRectangle().getSize().y / 2)),
+                        sf::Vertex(sf::Vector2f(gate.first.getRectangle().getPosition().x + gate.first.getRectangle().getSize().x,
+                                                 gate.first.getRectangle().getPosition().y + gate.first.getRectangle().getSize().y / 2))
+                    };
+                    line[0].color = sf::Color::Black;
+                    line[1].color = sf::Color::Black;
+                    _window.draw(line, 2, sf::Lines, sf::RenderStates::Default);
+                    break;
+                }
+            }
+            if (isLinked)
+                continue;
+        }
     }
     for (auto &gate : _otherGates) {
         nts::Tristate state = gate.second.first->compute(1);
@@ -116,7 +211,79 @@ void nts::SFMLModule::displayAll()
             gate.first.getRectangle().setFillColor(sf::Color(128, 128, 128, 255));
         gate.second.first->resetInfinityCounter();
         _window.draw(gate.first.getRectangle());
-        //_window.draw(gate.first.getText());
+        /////////////////////////////////////////////////////////////////////// draw text
+        std::string name = gate.first.getText().getString().toAnsiString();
+        sf::Font font;
+        if (!font.loadFromFile("Fonts/Montserrat-Regular.ttf"))
+            throw std::runtime_error("Error: Font not found");
+        sf::Text text;
+        text.setFont(font);
+        text.setString(name);
+        text.setFillColor(sf::Color::Black);
+        text.setCharacterSize(gate.first.getRectangle().getSize().x / 2);
+        text.setPosition(gate.first.getRectangle().getPosition().x + gate.first.getRectangle().getSize().x / 2 - text.getGlobalBounds().width / 2,
+                         gate.first.getRectangle().getPosition().y + gate.first.getRectangle().getSize().y / 2 - text.getGlobalBounds().height / 2);
+        _window.draw(text);
+        /////////////////////////////////////////////////////////////////////// draw link
+        bool isLinked = false;
+        for (size_t i = 1; i < gate.second.first->getNbPins(); i++) {
+            isLinked = false;
+            nts::IComponent *linked = gate.second.first->linkedTo(i);
+            for (auto &input : _inputGates) {
+                if (linked == input.second.first) {
+                    isLinked = true;
+                    sf::Vertex line[] = {
+                        sf::Vertex(sf::Vector2f(gate.first.getRectangle().getPosition().x,
+                                                 gate.first.getRectangle().getPosition().y + gate.first.getRectangle().getSize().y / 2)),
+                        sf::Vertex(sf::Vector2f(input.first.getRectangle().getPosition().x + input.first.getRectangle().getSize().x,
+                                                 input.first.getRectangle().getPosition().y + input.first.getRectangle().getSize().y / 2))
+                    };
+                    line[0].color = sf::Color::Black;
+                    line[1].color = sf::Color::Black;
+                    _window.draw(line, 2, sf::Lines, sf::RenderStates::Default);
+                    break;
+                }
+            }
+            if (isLinked)
+                continue;
+            for (auto &output : _outputGates) {
+                if (linked == output.second.first) {
+                    isLinked = true;
+                    sf::Vertex line[] = {
+                        sf::Vertex(sf::Vector2f(gate.first.getRectangle().getPosition().x,
+                                                 gate.first.getRectangle().getPosition().y + gate.first.getRectangle().getSize().y / 2)),
+                        sf::Vertex(sf::Vector2f(output.first.getRectangle().getPosition().x + output.first.getRectangle().getSize().x,
+                                                 output.first.getRectangle().getPosition().y + output.first.getRectangle().getSize().y / 2))
+                    };
+                    line[0].color = sf::Color::Black;
+                    line[1].color = sf::Color::Black;
+                    _window.draw(line, 2, sf::Lines, sf::RenderStates::Default);
+                    break;
+                }
+            }
+            if (isLinked)
+                continue;
+            for (auto &gate2 : _otherGates) {
+                if (linked == gate2.second.first) {
+                    isLinked = true;
+                    sf::Vertex line[] = {
+                            sf::Vertex(sf::Vector2f(gate.first.getRectangle().getPosition().x,
+                                                    gate.first.getRectangle().getPosition().y +
+                                                    gate.first.getRectangle().getSize().y / 2)),
+                            sf::Vertex(sf::Vector2f(
+                                    gate2.first.getRectangle().getPosition().x + gate2.first.getRectangle().getSize().x,
+                                    gate2.first.getRectangle().getPosition().y +
+                                    gate2.first.getRectangle().getSize().y / 2))
+                    };
+                    line[0].color = sf::Color::Black;
+                    line[1].color = sf::Color::Black;
+                    _window.draw(line, 2, sf::Lines, sf::RenderStates::Default);
+                    break;
+                }
+            }
+            if (isLinked)
+                continue;
+        }
     }
     _window.display();
 }
@@ -131,7 +298,7 @@ nts::SFMLGates::SFMLGates(std::string name, Type type, sf::VideoMode _videoMode,
     if (!_font.loadFromFile("Fonts/Montserrat-Regular.ttf")) // "Fonts/Montserrat-Regular.ttf"
         throw std::runtime_error("Error: Font not found");
     if (type == INPUT) {
-        x = (_videoMode.height / size);
+        x = 100;
         y += (_videoMode.height / size) * index;
     } else if (type == GATE) {
         x = _videoMode.width / 2;
@@ -148,6 +315,6 @@ nts::SFMLGates::SFMLGates(std::string name, Type type, sf::VideoMode _videoMode,
     _rectangle.setPosition(x, y);
     _text.setFont(_font);
     _text.setString(name);
-    _text.setFillColor(sf::Color::Red);
+    _text.setFillColor(sf::Color::Black);
     _text.setPosition(x + 25, y + 25);
 }
