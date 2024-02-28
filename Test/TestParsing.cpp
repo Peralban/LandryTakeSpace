@@ -252,5 +252,5 @@ Test(Parsing, allcomp)
         ac2 = e.what();
     }
     int ac3 = parsing.getNbComponents();
-    cr_assert_eq(ac3, 19);
+    cr_assert_eq(ac3, 30);
 }

@@ -1,16 +1,28 @@
 # Basic OR logic gate
 #
 # in_1  -1-+---\
-#          | or |-3- out
-# in_2  -2-+---/
+            #          | or |-3- out
+    #    in_2  -2-+---/
 
-.chipsets:
+        .chipsets:      #bonjour
+        input       in_2
 clock clo
-input in_2
 or gate
 output out
+output _o
+output 0urie
+
+        .links:
+            clo:1               gate:1      #bonjour
+        #bonjour
+in_2:1 gate:2
+
+.chipsets:
+output C
+output a
+
+output b
 
 .links:
-clo:1 gate:1
-in_2:1 gate:2
 gate:3 out:1
+
