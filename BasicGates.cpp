@@ -153,11 +153,14 @@ nts::Tristate nts::NotGate::compute(std::size_t pin)
 {
     checkInfinityCounter();
     if (isOutput(pin)) {
-        _state[pin] = getLink(1);
+        nts::Tristate buff = getLink(1);
+        if (buff == nts::Tristate::Undefined)
+            _state[pin] = nts::Tristate::Undefined;
+        else {
+            _state[pin] = buff == nts::Tristate::True ? nts::Tristate::False : nts::Tristate::True;
+        }
         _stateSet[pin] = 1;
-        if (_state[pin] == nts::Tristate::Undefined)
-            return nts::Tristate::Undefined;
-        return _state[pin] == nts::Tristate::True ? nts::Tristate::False : nts::Tristate::True;
+        return (nts::Tristate)_state[pin];
     }
     if (isInput(pin))
         return getLink(pin);
