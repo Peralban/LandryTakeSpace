@@ -240,6 +240,7 @@ Test(Parsing, Parsing12)
     }
     cr_assert_str_eq(ac.c_str(), ac2.c_str());
 }
+
 Test(Parsing, allcomp)
 {
     nts::ParseFile parsing;
@@ -253,4 +254,49 @@ Test(Parsing, allcomp)
     }
     int ac3 = parsing.getNbComponents();
     cr_assert_eq(ac3, 30);
+}
+
+Test(Parsing, allcomp2)
+{
+    nts::ParseFile parsing;
+    std::string ac2;
+    try {
+        parsing.setFileName("Test/Templates/wtf.nts");
+        parsing.fileInVector();
+        parsing.parseData();
+    } catch (nts::Error &e) {
+        ac2 = e.what();
+    }
+    std::string ac = "Invalid line";
+    cr_assert_str_eq(ac.c_str(), ac2.c_str());
+}
+
+Test(Parsing, allcomp3)
+{
+    nts::ParseFile parsing;
+    std::string ac2;
+    try {
+        parsing.setFileName("Test/Templates/wtf2.nts");
+        parsing.fileInVector();
+        parsing.parseData();
+    } catch (nts::Error &e) {
+        ac2 = e.what();
+    }
+    std::string ac = "Invalid line";
+    cr_assert_str_eq(ac.c_str(), ac2.c_str());
+}
+
+Test(Parsing, allcomp4)
+{
+    nts::ParseFile parsing;
+    std::string ac2;
+    try {
+        parsing.setFileName("Test/Templates/wtf3.nts");
+        parsing.fileInVector();
+        parsing.parseData();
+    } catch (nts::Error &e) {
+        ac2 = e.what();
+    }
+    std::string ac = "Name already use";
+    cr_assert_str_eq(ac.c_str(), ac2.c_str());
 }

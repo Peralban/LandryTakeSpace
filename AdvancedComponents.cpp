@@ -152,7 +152,6 @@ nts::SumComponent::SumComponent() : AdvancedComponent(7)
         andGates[i] = new AndGate();
     IComponent *notGate = new NotGate();
     IComponent *xnorGate = new XNorGate();
-    IComponent *tmpXNorGate = new XNorGate();
     std::vector<IComponent *> splitter(5);
     for (std::size_t i = 0; i < 5; i++)
         splitter[i] = new Splitter(3);
@@ -169,14 +168,12 @@ nts::SumComponent::SumComponent() : AdvancedComponent(7)
     // splitter[0] pin 1 is already used
     splitter[0]->setLink(2, orGates[0], 1);
     splitter[0]->setLink(3, andGates[0], 1);
-    //splitter[0]->setUnused(4); // replaced by the next line
-    splitter[0]->setLink(4, tmpXNorGate, 1);
+    splitter[0]->setUnused(4);
 
     // splitter[1] pin 1 is already used
     splitter[1]->setLink(2, orGates[0], 2);
     splitter[1]->setLink(3, andGates[0], 2);
-    //splitter[1]->setUnused(4); // replaced by the next line
-    splitter[1]->setLink(4, tmpXNorGate, 2);
+    splitter[1]->setUnused(4);
 
     splitter[2]->setLink(1, andGates[0], 3);
     // splitter[2] pin 2 is already used
@@ -205,15 +202,11 @@ nts::SumComponent::SumComponent() : AdvancedComponent(7)
 
     orGates[2]->setLink(1, notGate, 2);
     // orGates[2] pin 2 is already used
-    //orGates[2]->setLink(3, xnorGate, 2); // replaced by the next line
-    orGates[2]->setUnused(3);
+    orGates[2]->setLink(3, xnorGate, 2);
 
     // notGates all pins are already used
 
     // xnorGate all pins are already used
-
-    // tmpXNorGate new link
-    tmpXNorGate->setLink(3, xnorGate, 2);
 }
 
 /*-----------------High Speed Par Carry-----------------*/
