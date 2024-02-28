@@ -34,9 +34,7 @@ nts::Tristate nts::SpecialComponent::compute(std::size_t pin)
             _state[1] = _state[1] == nts::Tristate::True ? nts::Tristate::False : nts::Tristate::True;
         }
         IComponent *linked = linkedTo(1);
-        std::cout << "linked: " << linked << std::endl;
         if (linked != nullptr) {
-            std::cout << "other pin: " << getOtherPin(1) << std::endl;
             linked->clearStateSet(getOtherPin(1));
         }
         return (nts::Tristate)_state[1];

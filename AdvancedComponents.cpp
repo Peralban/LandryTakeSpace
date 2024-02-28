@@ -372,16 +372,12 @@ nts::Tristate nts::JohnsonCounterHard::compute(std::size_t pin)
     }
     if (isOutput(pin)) {
         nts::Tristate buff = getLink(6);
-        if (buff == nts::Tristate::True && _stateSet[6] == 0) {
+        if (buff == nts::Tristate::True && _stateSet[6] == 0 && getLink(7) == nts::False) {
             _data++;
             _stateSet[6] = 1;
             _state[6] = buff;
             if (_data == 10)
                 _data = 0;
-            for (int i = 1; i <= 5; i++) {
-                _state[i] = (outputData >> (_data + 5 - i)) & 1;
-                _stateSet[i] = 1;
-            }
         }
         buff = getLink(7);
         if (buff == nts::Tristate::True) {
@@ -390,6 +386,20 @@ nts::Tristate nts::JohnsonCounterHard::compute(std::size_t pin)
             _state[7] = buff;
             for (int i = 1; i <= 5; i++) {
                 _state[i] = 0;
+                _stateSet[i] = 1;
+            }
+        }
+        if (buff == nts::Tristate::False) {
+            _stateSet[7] = 1;
+            _state[7] = buff;
+            for (int i = 1; i <= 5; i++) {
+                _state[i] = (outputData >> (_data + 5 - i)) & 1;
+                _stateSet[i] = 1;
+            }
+        }
+        if (buff == nts::Undefined) {
+            for (int i = 1; i <= 5; i++) {
+                _state[i] = nts::Tristate::Undefined;
                 _stateSet[i] = 1;
             }
         }
@@ -509,7 +519,6 @@ nts::Component4017::Component4017() : AdvancedComponent(16)
     setInternLink(13, notClock, 1); // CP1: EN/ -> x
     notClock->setLink(2, andClock, 2);
 
-    //IComponent *jhonsonCounter = new JohnsonCounter();
     IComponent *jhonsonCounter = new JohnsonCounterHard();
 
     andClock->setLink(3, jhonsonCounter, 6); // x -> CP
