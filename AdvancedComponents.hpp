@@ -61,7 +61,6 @@ namespace nts {
     public:
         JohnsonDecoder();
         ~JohnsonDecoder() = default;
-        //void clearStateSet(size_t pin) override;
     };
 
     // 4017 component: 10 bits Johnson decade
@@ -69,6 +68,23 @@ namespace nts {
     public:
         Component4017();
         ~Component4017() = default;
+    };
+
+    // 12 bits binary counter
+    class TwelveBitsCounter : public AComponent {
+    public:
+        TwelveBitsCounter();
+        ~TwelveBitsCounter() = default;
+        nts::Tristate compute(std::size_t pin) override;
         void clearStateSet(size_t pin) override;
+    private:
+        int _data;
+    };
+
+    // 4040 component: 12 bits binary counter
+    class Component4040 : public AdvancedComponent {
+    public:
+        Component4040();
+        ~Component4040() = default;
     };
 }
