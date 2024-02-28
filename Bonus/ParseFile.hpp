@@ -13,7 +13,9 @@
 #include "AdvancedComponents.hpp"
 #include <memory>
 #include <fstream>
+#include <map>
 #include <cstring>
+#include <functional>
 
 namespace nts
 {
@@ -38,8 +40,10 @@ namespace nts
         "4071",
         "4081",
         "4094",
+        "4512",
         "4514",
         "4801",
+        "2716",
         "end"
     };
 
@@ -59,6 +63,26 @@ namespace nts
     static std::vector <std::string> flags = {
         ".chipsets:",
         ".links:"
+    };
+
+    static std::map<std::string, std::function<std::unique_ptr<nts::IComponent> ()>> componentFactory = {
+            {"input", []() -> std::unique_ptr <nts::IComponent> { return std::make_unique<nts::InputComponent>(); }},
+            {"output", []() -> std::unique_ptr <nts::IComponent> { return std::make_unique<nts::OutputComponent>(); }},
+            {"clock", []() -> std::unique_ptr <nts::IComponent> { return std::make_unique<nts::ClockComponent>(); }},
+            {"true", []() -> std::unique_ptr <nts::IComponent> { return std::make_unique<nts::TrueComponent>(); }},
+            {"false", []() -> std::unique_ptr <nts::IComponent> { return std::make_unique<nts::FalseComponent>(); }},
+            {"and", []() -> std::unique_ptr <nts::IComponent> { return std::make_unique<nts::AndGate>(); }},
+            {"or", []() -> std::unique_ptr <nts::IComponent> { return std::make_unique<nts::OrGate>(); }},
+            {"xor", []() -> std::unique_ptr <nts::IComponent> { return std::make_unique<nts::XorGate>(); }},
+            {"not", []() -> std::unique_ptr <nts::IComponent> { return std::make_unique<nts::NotGate>(); }},
+            {"4001", []() -> std::unique_ptr <nts::IComponent> { return std::make_unique<nts::Component4001>(); }},
+            {"4008", []() -> std::unique_ptr <nts::IComponent> { return std::make_unique<nts::Component4008>(); }},
+            {"4011", []() -> std::unique_ptr <nts::IComponent> { return std::make_unique<nts::Component4011>(); }},
+            {"4013", []() -> std::unique_ptr <nts::IComponent> { return std::make_unique<nts::Component4013>(); }},
+            {"4030", []() -> std::unique_ptr <nts::IComponent> { return std::make_unique<nts::Component4030>(); }},
+            {"4069", []() -> std::unique_ptr <nts::IComponent> { return std::make_unique<nts::Component4069>(); }},
+            {"4071", []() -> std::unique_ptr <nts::IComponent> { return std::make_unique<nts::Component4071>(); }},
+            {"4081", []() -> std::unique_ptr <nts::IComponent> { return std::make_unique<nts::Component4081>(); }}
     };
 
     typedef std::vector<std::pair<nts::IComponent *, std::string>> componentAndNameInVector;

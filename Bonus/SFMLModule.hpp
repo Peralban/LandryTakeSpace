@@ -30,10 +30,10 @@ namespace nts {
 
     class SFMLGates {
     public:
-        SFMLGates(std::string name, Type type, sf::VideoMode _videoMode);
+        SFMLGates(std::string name, Type type, sf::VideoMode _videoMode, size_t size, int index);
         ~SFMLGates() = default;
         sf::RectangleShape &getRectangle() { return _rectangle; }
-        sf::Text &getText() { return _text; }
+        sf::Text getText() { return _text; }
     private:
         sf::RectangleShape _rectangle;
         sf::Text _text;
@@ -53,7 +53,7 @@ namespace nts {
         void createInputGates(allInputAndNameInVector inputs, Type type);
         sf::Event &getEvent() { return _event; }
         sf::RenderWindow &getWindow() { return _window; }
-        void display();
+        void displayAll();
     private:
         sf::RenderWindow _window;
         sf::Event _event;

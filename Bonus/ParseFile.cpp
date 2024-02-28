@@ -32,14 +32,20 @@ void nts::ParseFile::checkName(std::vector<std::string> type, std::string name)
 
 void nts::ParseFile::saveLinkInVector(std::string line, std::vector<std::string> &names)
 {
+    while (line[0] == ' ' || line[0] == '\t')
+        line = line.substr(1);
     std::string firstName = line.substr(0, line.find(":"));
     checkName(names, firstName);
     line = line.substr(line.find(":") + 1);
     std::string firstPin = line.substr(0, line.find(" "));
-    line = line.substr(line.find(" ") + 1);
+    int n = line.find(" ") > line.find("\t") ? line.find("\t") : line.find(" ");
+    line = line.substr(n);
+    while (line[0] == ' ' || line[0] == '\t')
+        line = line.substr(1);
     std::string secondName = line.substr(0, line.find(":"));
     checkName(names, secondName);
-    line = line.substr(line.find(":") + 1, line.find(" "));
+    n = line.find(":") > line.find("\t") ? line.find("\t") : line.find(":");
+    line = line.substr(line.find(":") + 1, n);
     std::string secondPin = line;
     _links.push_back(std::make_pair(std::make_pair(firstName, firstPin), std::make_pair(secondName, secondPin)));
 }
@@ -55,10 +61,16 @@ static bool isInput(std::string name)
 
 void nts::ParseFile::saveShipsetInVector(std::string line, std::vector<std::string> &names)
 {
-    std::string componentName = line.substr(0, line.find(" "));
-    line = line.substr(line.find(" ") + 1);
+    while (line[0] == ' ' || line[0] == '\t')
+        line = line.substr(1);
+    int n = line.find(" ") > line.find("\t") ? line.find("\t") : line.find(" ");
+    std::string componentName = line.substr(0, n);
+    line = line.substr(n);
+    while (line[0] == ' ' || line[0] == '\t')
+        line = line.substr(1);
     checkName(nts::type, componentName);
-    std::string name = line.substr(0, line.find(" "));
+    n = line.find(" ") > line.find("\t") ? line.find("\t") : line.find(" ");
+    std::string name = line.substr(0, n);
     names.pop_back();
     names.push_back(name);
     names.push_back("end");
@@ -77,6 +89,11 @@ void nts::ParseFile::saveShipsetInVector(std::string line, std::vector<std::stri
 
 static bool isFlag(std::string line, nts::ParseState &state)
 {
+    std::regex reg("^([ \\t]+)?.[\\w]+:([ \\t]+)?(#.*)?$", std::regex_constants::ECMAScript | std::regex_constants::multiline);
+    if (!std::regex_match(line, reg))
+        return false;
+    line = line.substr(line.find("."));
+    line = line.substr(0, line.find(":") + 1);
     for (size_t i = 0; i < nts::flags.size(); i++) {
         if (line == nts::flags[i]) {
             state = static_cast<nts::ParseState>(i);
@@ -90,23 +107,22 @@ static void checkLine(std::string line, nts::ParseState state)
 {
     std::regex reg;
 
-    if (state == nts::ParseState::CHIPSETS) {
-        reg = std::regex("^[\\w]+ [\\w]+( #.*)?$");
-    } else if (state == nts::ParseState::LINKS) {
-        reg = std::regex("^[\\w]+:[\\d]+ [\\w]+:[\\d]+( #.*)?$");
-    }
-    if (!std::regex_match(line, reg)) {
+    if (state == nts::ParseState::CHIPSETS)
+        reg = std::regex("^([ \\t]+)?([a-zA-Z0-9]+)\\s+(\\w+)(\\s+)?(#.*)?$", std::regex_constants::ECMAScript | std::regex_constants::multiline);
+    else if (state == nts::ParseState::LINKS)
+        reg = std::regex("^([ \\t]+)?([a-zA-Z0-9_]+)((\\s+)?:(\\s+)?)([0-9]+)\\s+([a-zA-Z0-9_]+)((\\s+)?:(\\s+)?)([0-9]+)([ \\t]+)?(#.*)?", std::regex_constants::ECMAScript | std::regex_constants::multiline);
+    if (!std::regex_match(line, reg))
         throw nts::Error("Invalid line");
-    }
 }
 
 
 void nts::ParseFile::parseData(void) {
     nts::ParseState state = nts::ParseState::NONE;
     std::vector <std::string> names;
+    std::regex regSpaceAndTab("^([ \\t]+)?(#.*)?$", std::regex_constants::ECMAScript | std::regex_constants::multiline);
     names.push_back("end");
     for (auto &line: _fileContent) {
-        if (line.empty() || line[0] == '#')
+        if (std::regex_match(line, regSpaceAndTab))
             continue;
         if (isFlag(line, state))
             continue;
@@ -132,39 +148,7 @@ void nts::ParseFile::linkComponents(void)
 
 std::unique_ptr<nts::IComponent> nts::ParseFile::createComponent(const std::string &type)
 {
-    if (type == "and")
-        return std::unique_ptr<nts::IComponent>(new nts::AndGate());
-    else if (type == "or")
-        return std::unique_ptr<nts::IComponent>(new nts::OrGate());
-    else if (type == "xor")
-        return std::unique_ptr<nts::IComponent>(new nts::XorGate());
-    else if (type == "not")
-        return std::unique_ptr<nts::IComponent>(new nts::NotGate());
-    else if (type == "true")
-        return std::unique_ptr<nts::IComponent>(new nts::TrueComponent());
-    else if (type == "false")
-        return std::unique_ptr<nts::IComponent>(new nts::FalseComponent());
-    else if (type == "4081")
-        return std::unique_ptr<nts::IComponent>(new nts::Component4081());
-    else if (type == "4071")
-        return std::unique_ptr<nts::IComponent>(new nts::Component4071());
-    else if (type == "4069")
-        return std::unique_ptr<nts::IComponent>(new nts::Component4069());
-    else if (type == "4030")
-        return std::unique_ptr<nts::IComponent>(new nts::Component4030());
-    else if (type == "4011")
-        return std::unique_ptr<nts::IComponent>(new nts::Component4011());
-    else if (type == "4001")
-        return std::unique_ptr<nts::IComponent>(new nts::Component4001());
-    else if (type == "input")
-        return std::unique_ptr<nts::IComponent>(new nts::InputComponent());
-    else if (type == "output")
-        return std::unique_ptr<nts::IComponent>(new nts::OutputComponent());
-    else if (type == "clock")
-        return std::unique_ptr<nts::IComponent>(new nts::ClockComponent());
-    else if (type == "4008")
-        return std::unique_ptr<nts::IComponent>(new nts::Component4008());
-    else if (type == "4013")
-        return std::unique_ptr<nts::IComponent>(new nts::Component4013());
+    if (componentFactory.find(type) != componentFactory.end())
+        return componentFactory[type]();
     throw nts::Error("Component not found");
 }

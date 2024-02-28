@@ -94,7 +94,7 @@ static void runSfml(nts::SFMLModule &sfmlModule, bool &smflIsRunning)
             }
         }
         sfmlModule.getWindow().clear(sf::Color::White);
-        sfmlModule.display();
+        sfmlModule.displayAll();
     }
     smflIsRunning = false;
 }
@@ -115,8 +115,10 @@ void nts::NanotekSpice::execShell(nts::SFMLModule &sfmlModule)
     printUserInput(nts::CMDTYPE::KNOWN);
     bool smflIsRunning = false;
     while (getline(std::cin, line)) {
-        if (line.empty())
+        if (line.empty()) {
+            printUserInput(nts::CMDTYPE::KNOWN);
             continue;
+        }
         if (line.find("=") != std::string::npos) {
             try {
                 checkExistence(_inputs, line);
