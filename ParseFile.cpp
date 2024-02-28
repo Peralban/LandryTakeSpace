@@ -59,6 +59,14 @@ static bool isInput(std::string name)
     return false;
 }
 
+static void nameIsAlreadyUse(std::vector<std::string> names, std::string name)
+{
+    for (size_t i = 0; i < names.size(); i++) {
+        if (names[i] == name)
+            throw nts::Error("Name already use");
+    }
+}
+
 void nts::ParseFile::saveShipsetInVector(std::string line, std::vector<std::string> &names)
 {
     while (line[0] == ' ' || line[0] == '\t')
@@ -71,6 +79,7 @@ void nts::ParseFile::saveShipsetInVector(std::string line, std::vector<std::stri
     checkName(nts::type, componentName);
     n = line.find(" ") > line.find("\t") ? line.find("\t") : line.find(" ");
     std::string name = line.substr(0, n);
+    nameIsAlreadyUse(names, name);
     names.pop_back();
     names.push_back(name);
     names.push_back("end");
@@ -89,7 +98,7 @@ void nts::ParseFile::saveShipsetInVector(std::string line, std::vector<std::stri
 
 static bool isFlag(std::string line, nts::ParseState &state)
 {
-    std::regex reg("^([ \\t]+)?.[\\w]+:([ \\t]+)?(#.*)?$", std::regex_constants::ECMAScript | std::regex_constants::multiline);
+    std::regex reg("^([ \\t]+)?\\.[\\w]+:([ \\t]+)?(#.*)?$", std::regex_constants::ECMAScript | std::regex_constants::multiline);
     if (!std::regex_match(line, reg))
         return false;
     line = line.substr(line.find("."));
@@ -106,13 +115,23 @@ static bool isFlag(std::string line, nts::ParseState &state)
 static void checkLine(std::string line, nts::ParseState state)
 {
     std::regex reg;
-
     if (state == nts::ParseState::CHIPSETS)
         reg = std::regex("^([ \\t]+)?([a-zA-Z0-9]+)\\s+(\\w+)(\\s+)?(#.*)?$", std::regex_constants::ECMAScript | std::regex_constants::multiline);
     else if (state == nts::ParseState::LINKS)
         reg = std::regex("^([ \\t]+)?([a-zA-Z0-9_]+)((\\s+)?:(\\s+)?)([0-9]+)\\s+([a-zA-Z0-9_]+)((\\s+)?:(\\s+)?)([0-9]+)([ \\t]+)?(#.*)?", std::regex_constants::ECMAScript | std::regex_constants::multiline);
     if (!std::regex_match(line, reg))
         throw nts::Error("Invalid line");
+}
+
+static bool checkAllLines(std::string line)
+{
+    std::regex reg1("^([ \\t]+)?(#.*)?$", std::regex_constants::ECMAScript | std::regex_constants::multiline);
+    std::regex reg2("^([ \\t]+)?([a-zA-Z0-9]+)\\s+(\\w+)(\\s+)?(#.*)?$", std::regex_constants::ECMAScript | std::regex_constants::multiline);
+    std::regex reg3("^([ \\t]+)?([a-zA-Z0-9_]+)((\\s+)?:(\\s+)?)([0-9]+)\\s+([a-zA-Z0-9_]+)((\\s+)?:(\\s+)?)([0-9]+)([ \\t]+)?(#.*)?", std::regex_constants::ECMAScript | std::regex_constants::multiline);
+    std::regex reg4("^([ \\t]+)?\\.[\\w]+:([ \\t]+)?(#.*)?$", std::regex_constants::ECMAScript | std::regex_constants::multiline);
+    if (std::regex_match(line, reg1) || std::regex_match(line, reg2) || std::regex_match(line, reg3) || std::regex_match(line, reg4))
+        return true;
+    return false;
 }
 
 
@@ -124,6 +143,8 @@ void nts::ParseFile::parseData(void) {
     for (auto &line: _fileContent) {
         if (std::regex_match(line, regSpaceAndTab))
             continue;
+        if (!checkAllLines(line))
+            throw nts::Error("Invalid line");
         if (isFlag(line, state))
             continue;
         checkLine(line, state);
