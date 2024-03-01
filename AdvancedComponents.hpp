@@ -87,4 +87,27 @@ namespace nts {
         Component4040();
         ~Component4040() = default;
     };
+
+    // 4801 component: Random access memory
+    class Component4801 : public AdvancedComponent {
+    public:
+        Component4801();
+        ~Component4801() = default;
+    };
+
+    // Component for the 4801: Binary cell
+    class BinaryCell : public AComponent {
+    public:
+        BinaryCell();
+        ~BinaryCell() = default;
+        nts::Tristate compute(std::size_t pin) override;
+    };
+
+    // 2 to 4 decoder
+    class TwoToFourDecoder : public AdvancedComponent {
+    public:
+        TwoToFourDecoder();
+        ~TwoToFourDecoder() = default;
+        nts::Tristate compute(std::size_t pin) override;
+    };
 }

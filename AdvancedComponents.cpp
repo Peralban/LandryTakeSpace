@@ -648,3 +648,201 @@ nts::Component4040::Component4040() : AdvancedComponent(16)
     setInternLink(15, twelveBitsCounter, 11);
     //pin 16 is unused
 }
+
+
+/*-----------------4801-----------------*/
+
+nts::Component4801::Component4801() : AdvancedComponent(16)
+{
+
+}
+
+/*-----------------BinaryCell-----------------*/
+
+nts::BinaryCell::BinaryCell() : AdvancedComponent(4)
+{
+    // 1 is Input
+    setInput(1);
+    // 2 is Select
+    setInput(2);
+    // 3 is Read/Write
+    setInput(3);
+    // 4 is Output
+    setOutput(4);
+
+    // Create all and gates
+    IComponent *I1andGate = new AndGate(3);
+    IComponent *I2andGate = new AndGate(3);
+    IComponent *OandGate = new AndGate(3);
+
+    // Create all not gates
+    IComponent *InotGate = new NotGate();
+    IComponent *RS1notGate = new NotGate();
+    IComponent *RS2notGate = new NotGate();
+    IComponent *OnotGate = new NotGate();
+
+    // Create all or gates
+    IComponent *RS1orGate = new OrGate();
+    IComponent *RS2orGate = new OrGate();
+
+    //create all splitter of the cell
+    IComponent *splitter1 = new Splitter(2);
+    IComponent *splitter2 = new Splitter(2);
+    IComponent *splitter3 = new Splitter(2);
+    IComponent *splitter4 = new Splitter(2);
+    IComponent *splitter5 = new Splitter(2);
+
+    //create the splitter of the rs flip-flop
+    IComponent *splitter6 = new Splitter(2);
+
+    // Set all internal links
+    AComponent::setInternLink(1, splitter1, 1);
+    AComponent::setInternLink(2, splitter2, 1);
+    AComponent::setInternLink(3, splitter3, 1);
+
+    //connect the first splitter to the not gate and the first and gate and the second Input and gate
+    splitter1->setLink(2, InotGate, 1);
+    InotGate->setLink(2, I1andGate, 2);
+    splitter1->setLink(3, I2andGate, 2);
+
+    //connect the second splitter to the second splitter and to the first and second input and gate in the first pin
+    //ANd the second pin of the second splitter to the first pin of the output and gate
+    splitter2->setLink(2, splitter4, 1);
+    splitter2->setLink(3, OandGate, 1);
+    splitter4->setLink(2, I1andGate, 1);
+    splitter4->setLink(3, I2andGate, 1);
+
+    //same as the previous one but with the third splitter and the second pin before the output and gate have a not gate
+    //And for the first and the second pin of the input and gate
+    splitter3->setLink(3, OnotGate, 1);
+    OnotGate->setLink(2, OandGate, 3);
+    splitter3->setLink(2, splitter5, 1);
+    splitter5->setLink(2, I1andGate, 3);
+    splitter5->setLink(3, I2andGate, 3);
+
+    //connect the first and gate to the first or gate of the rs flip-flop
+    I1andGate->setLink(4, RS1orGate, 1);
+
+    //connect the second and gate to the second or gate of the rs flip-flop
+    I2andGate->setLink(4, RS2orGate, 2);
+
+    //connect twice or gate to their not gate
+    RS1orGate->setLink(3, RS1notGate, 1);
+    RS2orGate->setLink(3, RS2notGate, 1);
+
+    //connect their loop
+    RS1notGate->setLink(2, splitter6, 1);
+    splitter6->setLink(1, OandGate, 2);
+    splitter6->setLink(2, RS2orGate, 1);
+    RS2notGate->setLink(2, RS1orGate, 2);
+
+    //connect the output and gate to the output
+    AComponent::setInternLink(4, OandGate, 4);
+}
+
+nts::Tristate nts::BinaryCell::compute(std::size_t pin)
+{
+    if (isInput(pin)) {
+        return getLink(pin);
+    }
+    if (isOutput(pin)) {
+        return linkedTo(pin)->compute(getOtherPin(pin));
+    }
+    throw nts::Error("Pin index out of range");
+}
+
+/*-----------------TwoToFourDecoder-----------------*/
+
+nts::TwoToFourDecoder::TwoToFourDecoder() : AdvancedComponent(6)
+{
+    // 1 is Input
+    setInput(1);
+    // 2 is Input
+    setInput(2);
+    // 3 is a enable pin
+    setInput(3);
+    // 3 is Output
+    setOutput(4);
+    // 4 is Output
+    setOutput(5);
+    // 5 is Output
+    setOutput(6);
+    // 6 is Output
+    setOutput(7);
+
+    // Create all and gates
+    IComponent *O1andGate = new AndGate(3);
+    IComponent *O2andGate = new AndGate(3);
+    IComponent *O3andGate = new AndGate(3);
+    IComponent *O4andGate = new AndGate(3);
+
+    // Create all splitter
+    IComponent *splitter1 = new Splitter(2);
+    IComponent *splitter2 = new Splitter(2);
+    IComponent *splitter3 = new Splitter(2);
+    IComponent *splitter4 = new Splitter(2);
+    IComponent *splitter5 = new Splitter(2);
+    IComponent *splitter6 = new Splitter(2);
+    IComponent *Enable = new Splitter(1);
+
+    // Create all Not gates
+    IComponent *I1notGate2 = new NotGate();
+    IComponent *I2notGate2 = new NotGate();
+
+    // Set all internal links
+    AComponent::setInternLink(1, splitter1, 1);
+    AComponent::setInternLink(2, splitter2, 1);
+    AComponent::setInternLink(3, Enable, 1);
+    AComponent::setInternLink(4, O1andGate, 4);
+    AComponent::setInternLink(5, O2andGate, 4);
+    AComponent::setInternLink(6, O3andGate, 4);
+    AComponent::setInternLink(7, O4andGate, 4);
+
+    //{ connect the First input
+    //connect the first splitter to the first not gate and to an other splitter
+    splitter1->setLink(2, I1notGate2, 1);
+    splitter1->setLink(3, splitter3, 1);
+    //connect this splitter to the first pin of the second and gate, and to the last pin of the last and gate
+    splitter3->setLink(2, O2andGate, 1);
+    splitter3->setLink(3, O4andGate, 1);
+    //}
+
+    //{ connect the second input
+    //connect the second spillter and the second not gate and to an other splitter
+    splitter2->setLink(2, I2notGate2, 1);
+    splitter2->setLink(3, splitter4, 1);
+    //connect this splitter to the first pin of the third and gate, and to the first pin of the last and gate
+    splitter4->setLink(2, O3andGate, 1);
+    splitter4->setLink(3, O4andGate, 1);
+    //}
+
+    //{ connect the first not gate to an other splitter and to the first pin of the first and gate
+    // and to the second pin of the third and gate
+    I1notGate2->setLink(2, splitter5, 1);
+    splitter5->setLink(2, O1andGate, 1);
+    splitter5->setLink(3, O3andGate, 2);
+    //}
+
+    //{ connect the second not gate to an other splitter and to the second pin of the first and gate
+    // and to the second pin of the second and gate
+    I2notGate2->setLink(2, splitter6, 1);
+    splitter6->setLink(2, O1andGate, 2);
+    splitter6->setLink(3, O2andGate, 2);
+    //}
+    //connect the enable to the last pin of all the and gates
+    Enable->setLink(2, O1andGate, 3);
+    Enable->setLink(2, O2andGate, 3);
+    Enable->setLink(2, O3andGate, 3);
+    Enable->setLink(2, O4andGate, 3);
+}
+
+nts::Tristate nts::TwoToFourDecoder::compute(std::size_t pin)
+{
+    if (isInput(pin)) {
+        return getLink(pin);
+    }
+    if (isOutput(pin)) {
+        return linkedTo(pin)->compute(getOtherPin(pin));
+    }
+    throw nts::Error("Pin index out of range");
+}
