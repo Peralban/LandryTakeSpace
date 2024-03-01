@@ -36,9 +36,9 @@ nts::DFlipFlop::DFlipFlop() : AdvancedComponent(6)
     // RESET
     setInternLink(4, splitter[3], 1);
     // Q
-    setInternLink(5, splitter[9], 2);
+    setInternLink(5, splitter[8], 2);
     // Q_NOT
-    setInternLink(6, splitter[8], 2);
+    setInternLink(6, splitter[9], 2);
     // all internal links are set
 
     for (std::size_t i = 0; i < 6; i++)
@@ -588,7 +588,7 @@ nts::Tristate nts::TwelveBitsCounter::compute(std::size_t pin)
             }
         }
         if (buff == nts::Undefined) {
-            _data = -1;
+            _data = 0;
             for (int i = 1; i <= 12; i++) {
                 _state[i] = nts::Tristate::Undefined;
                 _stateSet[i] = 1;
