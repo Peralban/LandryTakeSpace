@@ -648,3 +648,60 @@ nts::Component4040::Component4040() : AdvancedComponent(16)
     setInternLink(15, twelveBitsCounter, 11);
     //pin 16 is unused
 }
+
+/*-----------------4512-----------------*/
+
+nts::Component4512::Component4512() : AComponent(16)
+{
+    for (std::size_t i = 1; i <= 16; i++)
+        setInput(i);
+    setOutput(14);
+    setUnused(8);
+    setUnused(16);
+}
+
+nts::Tristate nts::Component4512::compute(std::size_t pin)
+{
+    if (isInput(pin)) {
+        return getLink(pin);
+    }
+    if (isOutput(pin)) {
+        if (getLink(15) == nts::Tristate::True) {
+            return nts::Tristate::Undefined;
+        }
+        if (getLink(10) == nts::Tristate::True) {
+            return nts::Tristate::False;
+        }
+        int index = 0;
+        for (int i = 13; i >= 11; i--) {
+            nts::Tristate tmp = getLink(i);
+            tmp = (tmp == nts::Tristate::Undefined) ? nts::Tristate::False : tmp;
+            index = (index << 1) + (int)tmp;
+        }
+        if (index == 7)
+            _state[14] = getLink(9);
+        else
+            _state[14] = getLink(index + 1);
+        return (nts::Tristate)_state[pin];
+    }
+    throw nts::Error("Pin index out of range");
+}
+
+void nts::Component4512::clearStateSet(std::size_t pin)
+{
+    if (isInput(pin)) {
+        for (std::size_t i = 1; i <= 16; i++) {
+            if (isOutput(i)) {
+                clearStateSet(i);
+                compute(i);
+            }
+        }
+    }
+    if (isOutput(pin)) {
+        _stateSet[pin] = 0;
+        IComponent *linked = linkedTo(pin);
+        if (linked == nullptr)
+            return;
+        linked->clearStateSet(getOtherPin(pin));
+    }
+}
