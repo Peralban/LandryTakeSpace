@@ -34,8 +34,9 @@ nts::Tristate nts::SpecialComponent::compute(std::size_t pin)
             _state[1] = _state[1] == nts::Tristate::True ? nts::Tristate::False : nts::Tristate::True;
         }
         IComponent *linked = linkedTo(1);
-        if (linked != nullptr)
+        if (linked != nullptr) {
             linked->clearStateSet(getOtherPin(1));
+        }
         return (nts::Tristate)_state[1];
     }
     throw nts::Error("Pin index out of range");
@@ -47,29 +48,23 @@ nts::TrueComponent::TrueComponent() : SpecialComponent(nts::Tristate::True)
 {
     for (std::size_t i = 2; i <= 5; i++)
         setUnused(i);
-    _state[1] = nts::Tristate::True;
 }
 
 nts::FalseComponent::FalseComponent() : SpecialComponent(nts::Tristate::False)
 {
     for (std::size_t i = 2; i <= 5; i++)
         setUnused(i);
-    _state[1] = nts::Tristate::False;
 }
 
 /*-----------------CLOCK COMPONENT-----------------*/
 
-nts::ClockComponent::ClockComponent() : SpecialComponent(nts::Tristate::Undefined)
-{
-    _state[1] = nts::Tristate::Undefined;
-}
+nts::ClockComponent::ClockComponent() : SpecialComponent(nts::Tristate::Undefined) {}
 
 /*-----------------INPUT COMPONENT-----------------*/
 
 nts::InputComponent::InputComponent() : SpecialComponent(nts::Tristate::Undefined)
 {
     setUnused(5);
-    _state[1] = nts::Tristate::Undefined;
 }
 
 /*-----------------OUTPUT COMPONENT-----------------*/
