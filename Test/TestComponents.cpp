@@ -10,6 +10,10 @@
 #include "../GatesComponents.hpp"
 #include "../SpecialComponents.hpp"
 #include "../AdvancedComponents.hpp"
+#include <fstream>
+#include <bitset>
+#include <sstream>
+#include <cstdio>
 
 Test(component4001, NOR_gate)
 {
@@ -338,4 +342,41 @@ Test(component4512, eight_bits_selector)
         inputs[i]->compute(4);
     for (int i = 0; i < 100; i++)
         inputs[i]->compute(3);
+}
+
+Test(Logger, logger)
+{
+    nts::IComponent *component = new nts::Logger();
+    std::vector<nts::IComponent *> True(6);
+    std::vector<nts::IComponent *> False(4);
+    for (int i = 0; i < 6; i++)
+        True[i] = new nts::TrueComponent;
+    for (int i = 0; i < 4; i++)
+        False[i] = new nts::FalseComponent;
+    component->setLink(1, True[0], 1);
+    component->setLink(2, True[1], 1);
+    component->setLink(3, True[2], 1);
+    component->setLink(4, True[3], 1);
+    component->setLink(5, False[0], 1);
+    component->setLink(6, True[4], 1);
+    component->setLink(7, False[1], 1);
+    component->setLink(8, False[2], 1);
+    component->setLink(9, True[5], 1);
+    component->setLink(10, False[3], 1);
+
+    component->compute(696969);
+    std::ifstream file("log.bin");
+    if (!file.is_open())
+        cr_assert(0);
+    std::string line;
+    std::getline(file, line);
+
+    std::bitset<8> bitset("00101111");
+    char c = (char) bitset.to_ulong();
+    std::string str(1, c);
+    cr_assert_str_eq(line.c_str(), str.c_str());
+    if (remove("log.bin") != 0)
+        std::cout << "Error deleting file" << std::endl;
+    else
+        std::cout << "File successfully deleted" << std::endl;
 }

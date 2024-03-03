@@ -96,4 +96,12 @@ namespace nts {
         nts::Tristate compute(std::size_t pin) override;
         void clearStateSet(size_t pin) override;
     };
+
+    //logger
+    class Logger : public AComponent {
+    public:
+        Logger();
+        ~Logger() = default;
+        nts::Tristate compute(std::size_t pin) override;
+    };
 }

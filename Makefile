@@ -23,6 +23,7 @@ CXXFLAGS	=	-Wall -Wextra -Wshadow -I./include
 TESTSRC	=	$(filter-out main.cpp, $(SRC)) \
 			Test/Test_main.cpp				\
 			Test/TestParsing.cpp			\
+			Test/TestComponents.cpp			\
 
 
 all:	$(NAME)

@@ -89,7 +89,7 @@ void nts::ParseFile::saveShipsetInVector(std::string line, std::vector<std::stri
         _nbInput++;
         _inputsVector.push_back(std::make_pair(component, name));
     }
-    if (componentName == "output") {
+    if (componentName == "output" || componentName == "logger") {
         _nbOutput++;
         _outputsVector.push_back(std::make_pair(component, name));
     }
