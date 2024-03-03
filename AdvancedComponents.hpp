@@ -87,4 +87,13 @@ namespace nts {
         Component4040();
         ~Component4040() = default;
     };
+
+    //4512 component: 8 channel data selector
+    class Component4512 : public AComponent {
+    public:
+        Component4512();
+        ~Component4512() = default;
+        nts::Tristate compute(std::size_t pin) override;
+        void clearStateSet(size_t pin) override;
+    };
 }

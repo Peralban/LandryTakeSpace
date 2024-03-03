@@ -84,7 +84,8 @@ namespace nts
             {"4071", []() -> std::unique_ptr <nts::IComponent> { return std::make_unique<nts::Component4071>(); }},
             {"4081", []() -> std::unique_ptr <nts::IComponent> { return std::make_unique<nts::Component4081>(); }},
             {"4017", []() -> std::unique_ptr <nts::IComponent> { return std::make_unique<nts::Component4017>(); }},
-            {"4040", []() -> std::unique_ptr <nts::IComponent> { return std::make_unique<nts::Component4040>(); }}
+            {"4040", []() -> std::unique_ptr <nts::IComponent> { return std::make_unique<nts::Component4040>(); }},
+            {"4512", []() -> std::unique_ptr <nts::IComponent> { return std::make_unique<nts::Component4512>(); }}
     };
 
     typedef std::vector<std::pair<nts::IComponent *, std::string>> componentAndNameInVector;
