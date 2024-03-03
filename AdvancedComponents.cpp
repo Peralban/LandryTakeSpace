@@ -8,6 +8,8 @@
 #include "AdvancedComponents.hpp"
 #include "BasicGates.hpp"
 #include "SpecialComponents.hpp"
+#include <bitset>
+#include <fstream>
 
 /*-----------------D FLIP FLOP-----------------*/
 
@@ -704,4 +706,47 @@ void nts::Component4512::clearStateSet(std::size_t pin)
             return;
         linked->clearStateSet(getOtherPin(pin));
     }
+}
+
+/*-----------------LOGGER-----------------*/
+
+nts::Logger::Logger() : AComponent(11)
+{
+    for (std::size_t i = 1; i <= 10; i++)
+        setInput(i);
+    setOutput(11);
+}
+
+nts::Tristate nts::Logger::compute(std::size_t pin)
+{
+    if (pin == 11)
+        return nts::Tristate::Undefined;
+    if (pin == 696969)
+        pin = 11;
+    if (isInput(pin))
+        return getLink(pin);
+    if (isOutput(pin)) {
+        std::string log = "";
+        nts::Tristate buff;
+        if (getLink(10) == nts::Tristate::True || getLink(9) != nts::Tristate::True)
+            return nts::Tristate::Undefined;
+        for (std::size_t i = 1; i <= 8; i++) {
+            buff = getLink(i);
+            if (buff == nts::Tristate::Undefined)
+                log = "U" + log;
+            else
+                log = std::to_string((int)buff) + log;
+        }
+        if (log.find('U') != std::string::npos)
+            return nts::Tristate::Undefined;
+        std::ofstream file;
+        file.open("log.bin", std::ios::app);
+        if (!file.is_open())
+            throw nts::Error("Can't open log file");
+        std::bitset<8> bitset(log);
+        file << (char) bitset.to_ulong();
+        file.close();
+        return nts::Tristate::Undefined;
+    }
+    return nts::Tristate::Undefined;
 }
