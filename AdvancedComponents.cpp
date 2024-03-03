@@ -8,6 +8,8 @@
 #include "AdvancedComponents.hpp"
 #include "BasicGates.hpp"
 #include "SpecialComponents.hpp"
+#include <bitset>
+#include <fstream>
 
 /*-----------------D FLIP FLOP-----------------*/
 
@@ -647,4 +649,104 @@ nts::Component4040::Component4040() : AdvancedComponent(16)
     setInternLink(14, twelveBitsCounter, 10);
     setInternLink(15, twelveBitsCounter, 11);
     //pin 16 is unused
+}
+
+/*-----------------4512-----------------*/
+
+nts::Component4512::Component4512() : AComponent(16)
+{
+    for (std::size_t i = 1; i <= 16; i++)
+        setInput(i);
+    setOutput(14);
+    setUnused(8);
+    setUnused(16);
+}
+
+nts::Tristate nts::Component4512::compute(std::size_t pin)
+{
+    if (isInput(pin)) {
+        return getLink(pin);
+    }
+    if (isOutput(pin)) {
+        if (getLink(15) == nts::Tristate::True) {
+            return nts::Tristate::Undefined;
+        }
+        if (getLink(10) == nts::Tristate::True) {
+            return nts::Tristate::False;
+        }
+        int index = 0;
+        for (int i = 13; i >= 11; i--) {
+            nts::Tristate tmp = getLink(i);
+            tmp = (tmp == nts::Tristate::Undefined) ? nts::Tristate::False : tmp;
+            index = (index << 1) + (int)tmp;
+        }
+        if (index == 7)
+            _state[14] = getLink(9);
+        else
+            _state[14] = getLink(index + 1);
+        return (nts::Tristate)_state[pin];
+    }
+    throw nts::Error("Pin index out of range");
+}
+
+void nts::Component4512::clearStateSet(std::size_t pin)
+{
+    if (isInput(pin)) {
+        for (std::size_t i = 1; i <= 16; i++) {
+            if (isOutput(i)) {
+                clearStateSet(i);
+                compute(i);
+            }
+        }
+    }
+    if (isOutput(pin)) {
+        _stateSet[pin] = 0;
+        IComponent *linked = linkedTo(pin);
+        if (linked == nullptr)
+            return;
+        linked->clearStateSet(getOtherPin(pin));
+    }
+}
+
+/*-----------------LOGGER-----------------*/
+
+nts::Logger::Logger() : AComponent(11)
+{
+    for (std::size_t i = 1; i <= 10; i++)
+        setInput(i);
+    setOutput(11);
+}
+
+nts::Tristate nts::Logger::compute(std::size_t pin)
+{
+    if (pin == 11)
+        return nts::Tristate::Undefined;
+    if (pin == 696969)
+        pin = 11;
+    if (isInput(pin))
+        return getLink(pin);
+    if (isOutput(pin)) {
+        std::string log = "";
+        nts::Tristate buff;
+        if (getLink(10) == nts::Tristate::True || getLink(9) != nts::Tristate::True)
+            return nts::Tristate::Undefined;
+        for (std::size_t i = 1; i <= 8; i++) {
+            buff = getLink(i);
+            if (buff == nts::Tristate::Undefined)
+                log = "U" + log;
+            else
+                log = std::to_string((int)buff) + log;
+        }
+        if (log.find('U') != std::string::npos)
+            return nts::Tristate::Undefined;
+        std::ofstream file;
+        file.open("log.bin", std::ios::app);
+        if (!file.is_open())
+            throw nts::Error("Can't open log file");
+        std::bitset<8> bitset(log);
+        file << (char) bitset.to_ulong();
+        file.close();
+        return nts::Tristate::Undefined;
+    }
+    return nts::Tristate::Undefined;
 }

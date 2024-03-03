@@ -55,7 +55,8 @@ static void display(nts::allInputAndNameInVector Inputs, nts::allOutputAndNameIn
             std::cout << "  " << input.second << ": " << getValue(input.first->compute(1)) << std::endl;
     std::cout << "output(s):" << std::endl;
     for (auto &output : Outputs)
-        std::cout << "  " << output.second << ": " << getValue(output.first->compute(1)) << std::endl;
+        if (output.first->getNbPins() != 11)
+            std::cout << "  " << output.second << ": " << getValue(output.first->compute(1)) << std::endl;
 }
 
 static void simulate(nts::allInputAndNameInVector Inputs, nts::allOutputAndNameInVector Outputs, size_t &tick,
@@ -84,7 +85,10 @@ static void simulate(nts::allInputAndNameInVector Inputs, nts::allOutputAndNameI
         if (!input.first->isUnused(5))
             input.first->compute(5);
     for (auto &output : Outputs)
-        output.first->compute(1);
+        if (output.first->getNbPins() == 11)
+            output.first->compute(696969);
+        else
+            output.first->compute(1);
     saveValue.clear();
 }
 
