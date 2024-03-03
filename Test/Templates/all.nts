@@ -35,9 +35,13 @@ clock cl_2
 4013 di_2
 output out_2
 output out_3
+4017 bonjur
+4040 bonjur2
+4512 bonjur3
+      logger          log
 
 .links:
-in_1:1 an_1:1
+         in_1:1          an_1:1
 tr_3:1 an_1:2
 an_1:3 or_1:1
 in_2:1 xo_1:1
